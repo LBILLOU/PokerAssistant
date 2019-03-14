@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 from classes import *
 from functions import *
 from tkinter import *
@@ -124,22 +125,22 @@ btn4S.grid(row=11,column=3)
 btn3S.grid(row=12,column=3)
 btn2S.grid(row=13,column=3)
 # Player Pane UI
-btnPH1 = Button(playerPane,text='',command=lambda:playersCardClicked(btnPH1,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
-btnPH2 = Button(playerPane,text='',command=lambda:playersCardClicked(btnPH2,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
+btnPH1 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH1,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
+btnPH2 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH2,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
 btnPH1.grid(row=0,column=0)
 btnPH2.grid(row=0,column=1)
 
-lblPHR = Label(playerPane,text='')
+lblPHR = Label(playerPane,text='0')
 lblPName = Label(playerPane,text=player_one.name,font='Arial 14 bold')
 lblPHR.grid(row=1,columnspan=2)
 lblPName.grid(row=2,columnspan=2)
 
 # Board Pane UI
-btnBF1 = Button(boardPane,text='',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBF2 = Button(boardPane,text='',command=lambda:boardCardClicked(btnBF2,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBF3 = Button(boardPane,text='',command=lambda:boardCardClicked(btnBF3,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBT = Button(boardPane,text='',command=lambda:boardCardClicked(btnBT,player_one,board_one,deck_one),width=3,highlightbackground='#89008c')
-btnBR = Button(boardPane,text='',command=lambda:boardCardClicked(btnBR,player_one,board_one,deck_one),width=3,highlightbackground='#c100ab')
+btnBF1 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBF2 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF2,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBF3 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF3,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBT = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBT,player_one,board_one,deck_one),width=3,highlightbackground='#89008c')
+btnBR = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBR,player_one,board_one,deck_one),width=3,highlightbackground='#c100ab')
 btnBF1.grid(row=0,column=0)
 btnBF2.grid(row=0,column=1)
 btnBF3.grid(row=0,column=2)
@@ -156,7 +157,7 @@ lblBoardName = Label(boardPane,text='Board',font='Arial 14 bold')
 lblBoardName.grid(row=2,columnspan=5)
 
 # Side Bar UI sideBar
-btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5)
+btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
 lbltest1 = Label(sideBar,text='',width=5)
 lbltest2 = Label(sideBar,text='',width=5)
@@ -174,6 +175,11 @@ sideBar.pack(side=RIGHT,fill=X)
 # .pop() into funcion
 # pytoexe
 
+def initUI():
+     #window.configure(width=900, height=500)
+     refreshUI()
+     return True
+
 def refreshUI():
     cardElems = [player_one.hand1, player_one.hand2, board_one.flop1, board_one.flop2, board_one.flop3, board_one.turn, board_one.river]
     uiCardElems = [btnPH1, btnPH2, btnBF1, btnBF2, btnBF3, btnBT, btnBR]
@@ -182,7 +188,10 @@ def refreshUI():
             uiCardElems[i]['text'] = cardElems[i][0].show()
         else:
             uiCardElems[i]['text'] = ''
-    lblPHR['text'] = str(player_one.handRank) #  * '★'
+    lblPHR['text'] = str(player_one.handRank)
+    # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
+    # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
+    window.geometry(window.geometry())
     return True
 
 def playersCardClicked(btn, player, board, deck):
@@ -311,18 +320,13 @@ def resetCardsInPlay(player, board, deck):
     checkPlayersHandRanking(player)
     refreshUI()
     print('> resetCardsInPlay')
-    print('> deck lenght : ', end = '')
     print(len(deck.cards))
     return True
 
 
-
-
-
-
-
-refreshUI()
+#window.after(5000, refreshUI)
 window.mainloop()
 
-    #print('Cards in deck : ' + str(len(deck.cards)))
+
+#print('Cards in deck : ' + str(len(deck.cards)))
 #print(button2card(btn14H.cget('text')))
