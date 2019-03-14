@@ -158,8 +158,12 @@ lblBoardName.grid(row=2,columnspan=5)
 # Side Bar UI sideBar
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5)
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:checkHighCard(player_one,board_one),width=5)
-btnReset.grid(row=1,column=0)
+lbltest1 = Label(sideBar,text='',width=5)
+lbltest2 = Label(sideBar,text='',width=5)
+lbltest1.grid(row=1,column=0)
+lbltest2.grid(row=2,column=0)
+# btnReset = Button(sideBar,text='Check',command=lambda:checkHighCard(player_one,board_one),width=5)
+# btnReset.grid(row=1,column=0)
 
 
 selectionPane.pack(side=LEFT,fill=X)
@@ -168,8 +172,6 @@ boardPane.pack(side=LEFT,fill=X)
 sideBar.pack(side=RIGHT,fill=X)
 
 # .pop() into funcion
-# rank = 0 --> not '' but '.'
-# GIT ?
 # pytoexe
 
 def refreshUI():
