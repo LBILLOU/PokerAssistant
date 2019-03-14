@@ -1,2 +1,7 @@
 chenFormulaForAll.txt
 __pycache__/*
+icon/*
+
+# pyinstaller files
+build/*
+dist/*
