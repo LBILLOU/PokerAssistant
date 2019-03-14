@@ -205,7 +205,7 @@ def cardsInPlayClicked(btn, player, board, deck):
     # Print error if no card in button
     selectedCard = btn2card(btn)
     for i in range(len(cardsInPlay)):
-        if cardsInPlay[i] and selectedCard.value == cardsInPlay[i][0].value and selectedCard.suit == cardsInPlay[i][0].suit:
+        if cardsInPlay[i] and selectedCard != '' and selectedCard.value == cardsInPlay[i][0].value and selectedCard.suit == cardsInPlay[i][0].suit:
             # If yes, remove from cardsInPlay and add back to deck
             if i == 0:
                 player.hand1.pop()

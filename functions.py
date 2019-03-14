@@ -81,6 +81,8 @@ def btn2card(btn):
         value = btn['text'][0]
     elif len(btn['text']) == 3:
         value = btn['text'][0:2]
+    else:
+        return ''
     # Managing transcodification
     if value == 'A':
         value = 14
