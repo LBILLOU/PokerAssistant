@@ -6,3 +6,4 @@ icon/*
 build/*
 dist/*
 .DS_Store
+main.spec
