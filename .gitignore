@@ -5,3 +5,4 @@ icon/*
 # pyinstaller files
 build/*
 dist/*
+.DS_Store
