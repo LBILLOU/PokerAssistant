@@ -116,6 +116,10 @@ def createCardsToCheck(player,board):
     ###print(cardsInPlay)
     return cardsInPlay
 
+def checkPokerCombination(player, board, deck):
+    checkHighCard(player, board, deck)
+    checkPair(player, board, deck)
+
 def checkHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if cardsInPlay == []:

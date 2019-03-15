@@ -159,7 +159,7 @@ lblBoardName.grid(row=2,columnspan=5)
 # Side Bar UI sideBar
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:checkPair(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
+btnReset = Button(sideBar,text='Check',command=lambda:checkPokerCombination(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=1,column=0)
 
 
