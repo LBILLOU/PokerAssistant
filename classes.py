@@ -60,8 +60,8 @@ class Deck():
     def create(self):
         # Function to build a deck of cards
         self.cards = []
-        for suit in ['H', 'C', 'D', 'S']:
-            for value in range(14,1,-1):
+        for value in range(14,1,-1):
+            for suit in ['H', 'C', 'D', 'S']:
                 self.cards.append(Card(value, suit))
         return True
 

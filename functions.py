@@ -112,28 +112,63 @@ def createCardsToCheck(player,board):
     cardSlots = [elem for elem in allSlots if elem != []]
     # Turn list of list into list
     cardsInPlay = [card for cardList in cardSlots for card in cardList]
-    print('>>> createCardsToCheck : ', end = '')
-    print(cardsInPlay)
+    ###print('>>> createCardsToCheck : ', end = '')
+    ###print(cardsInPlay)
     return cardsInPlay
 
-def checkHighCard(player,board):
+def checkHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
-    # Sorting cards from high to low
-    cardsInPlay.sort(key=lambda card: card.value, reverse=True)
-    highCard = cardsInPlay[0]
-    print('>>> checkHighCard : ', end = '')
-    print(highCard)
-    return highCard
-    # if list empty...
+    if cardsInPlay == []:
+        return False
+    else:
+        # Sorting cards from high to low
+        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
+        highCard = cardsInPlay[0]
+        outs = checkHighCardOuts(deck, highCard)
+        print('>>> checkHighCard : ', end = '')
+        print(highCard)
+        print('>>> checkHighCardOuts : ', end = '')
+        print(outs)
+    return highCard, outs
 
-def checkPair(player,board):
+def checkHighCardOuts(deck, highCard):
+    outs = []
+    for i in range(len(deck.cards)):
+        if deck.cards[i].value > highCard.value:
+            outs.append(deck.cards[i])
+    return outs
+
+def checkPair(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
+    if len(cardsInPlay) < 2:
+        return False
+    else:
+        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
+        for i in range(len(cardsInPlay)-1):
+            if cardsInPlay[i].value == cardsInPlay[i+1].value:
+                pair = [cardsInPlay[i], cardsInPlay[i+1]]
+                outs = checkPairOuts(cardsInPlay, pair, deck)
+                print('>>> checkPair : ', end = '')
+                print(pair)
+                print('>>> checkPairOuts : ', end = '')
+                print(outs)
+                return pair
+        return False
 
-    print('>>> checkPair : ', end = '')
-    return True
-
-
-
+def checkPairOuts(cardsInPlay, pair, deck):
+    outs = []
+    # Remove card lower or equal to pair
+    cardsInPlay2 = []
+    for card in cardsInPlay:
+        if card.value > pair[0].value:
+            cardsInPlay2.append(card)
+    #manage empty
+    print(cardsInPlay2)
+    for card in deck.cards:
+        for kard in cardsInPlay2:
+            if card.value == kard.value:
+                outs.append(card)
+    return outs
 
 
 

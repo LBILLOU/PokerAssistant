@@ -131,7 +131,7 @@ btnPH1.grid(row=0,column=0)
 btnPH2.grid(row=0,column=1)
 
 lblPHR = Label(playerPane,text='0')
-lblPName = Label(playerPane,text=player_one.name,font='Arial 14 bold')
+lblPName = Label(playerPane,text=player_one.name)
 lblPHR.grid(row=1,columnspan=2)
 lblPName.grid(row=2,columnspan=2)
 
@@ -147,24 +147,21 @@ btnBF3.grid(row=0,column=2)
 btnBT.grid(row=0,column=3)
 btnBR.grid(row=0,column=4)
 
-lblBFlop = Label(boardPane,text='Flop',font='Arial 14')
+lblBFlop = Label(boardPane,text='Flop')
 lblBFlop.grid(row=1,column=0,columnspan=3)
-lblBTurn = Label(boardPane,text='Turn',font='Arial 14')
+lblBTurn = Label(boardPane,text='Turn')
 lblBTurn.grid(row=1,column=3,columnspan=1)
-lblBRiver = Label(boardPane,text='River',font='Arial 14')
+lblBRiver = Label(boardPane,text='River')
 lblBRiver.grid(row=1,column=4,columnspan=1)
-lblBoardName = Label(boardPane,text='Board',font='Arial 14 bold')
+lblBoardName = Label(boardPane,text='Board')
 lblBoardName.grid(row=2,columnspan=5)
 
 # Side Bar UI sideBar
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-lbltest1 = Label(sideBar,text='',width=5)
-lbltest2 = Label(sideBar,text='',width=5)
-lbltest1.grid(row=1,column=0)
-lbltest2.grid(row=2,column=0)
-# btnReset = Button(sideBar,text='Check',command=lambda:checkHighCard(player_one,board_one),width=5)
-# btnReset.grid(row=1,column=0)
+btnReset = Button(sideBar,text='Check',command=lambda:checkPair(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
+btnReset.grid(row=1,column=0)
+
 
 
 selectionPane.pack(side=LEFT,fill=X)
@@ -173,12 +170,7 @@ boardPane.pack(side=LEFT,fill=X)
 sideBar.pack(side=RIGHT,fill=X)
 
 # .pop() into funcion
-# pytoexe
-
-def initUI():
-     #window.configure(width=900, height=500)
-     refreshUI()
-     return True
+#
 
 def refreshUI():
     cardElems = [player_one.hand1, player_one.hand2, board_one.flop1, board_one.flop2, board_one.flop3, board_one.turn, board_one.river]
