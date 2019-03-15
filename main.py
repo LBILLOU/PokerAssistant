@@ -12,8 +12,9 @@ window.title('Poker Assistant')
 
 selectionPane = Frame(window)
 playerPane = Frame(window)
-boardPane = Frame(window)
+cardsInPlayPane = Frame(window)
 sideBar = Frame(window)
+combinationPane = Frame(window)
 
 # SELECTION PANE UI
 # Hearts ♥♥♥♥♥♥♥
@@ -135,44 +136,70 @@ lblPName = Label(playerPane,text=player_one.name)
 lblPHR.grid(row=1,columnspan=2)
 lblPName.grid(row=2,columnspan=2)
 
-# Board Pane UI
-btnBF1 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBF2 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF2,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBF3 = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBF3,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
-btnBT = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBT,player_one,board_one,deck_one),width=3,highlightbackground='#89008c')
-btnBR = Button(boardPane,text='-',command=lambda:boardCardClicked(btnBR,player_one,board_one,deck_one),width=3,highlightbackground='#c100ab')
+# Cards in Play Pane UI
+btnBF1 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBF2 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF2,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBF3 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF3,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
+btnBT = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBT,player_one,board_one,deck_one),width=3,highlightbackground='#89008c')
+btnBR = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBR,player_one,board_one,deck_one),width=3,highlightbackground='#c100ab')
 btnBF1.grid(row=0,column=0)
 btnBF2.grid(row=0,column=1)
 btnBF3.grid(row=0,column=2)
 btnBT.grid(row=0,column=3)
 btnBR.grid(row=0,column=4)
 
-lblBFlop = Label(boardPane,text='Flop')
+lblBFlop = Label(cardsInPlayPane,text='Flop')
 lblBFlop.grid(row=1,column=0,columnspan=3)
-lblBTurn = Label(boardPane,text='Turn')
+lblBTurn = Label(cardsInPlayPane,text='Turn')
 lblBTurn.grid(row=1,column=3,columnspan=1)
-lblBRiver = Label(boardPane,text='River')
+lblBRiver = Label(cardsInPlayPane,text='River')
 lblBRiver.grid(row=1,column=4,columnspan=1)
-lblBoardName = Label(boardPane,text='Board')
+lblBoardName = Label(cardsInPlayPane,text='Board')
 lblBoardName.grid(row=2,columnspan=5)
 
-# Side Bar UI sideBar
+# Side Bar UI
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:checkPokerCombination(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
+btnReset = Button(sideBar,text='Check',command=lambda:check2Pairs(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=1,column=0)
 
+# Combination Panu UI
+lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=12,anchor=W)
+lblStrFlush = Label(combinationPane,text='Straight Flush',width=12)
+lbl4oaKind = Label(combinationPane,text='Four of a Kind',width=12)
+lblFullHouse = Label(combinationPane,text='Full House',width=12)
+lblFlush = Label(combinationPane,text='Flush',width=12)
+lblStraight = Label(combinationPane,text='Straight',width=12)
+lbl3oaKind = Label(combinationPane,text='Three of a kind',width=12)
+lbl2Pairs = Label(combinationPane,text='Two Pairs',width=12)
+lblPair = Label(combinationPane,text='Pair',width=12)
+lblHighCard = Label(combinationPane,text='High Card',width=12)
+lblSpacing = Label(combinationPane,text='',width=12)
+lblRoyalFlush.grid(row=0,column=0)
+lblStrFlush.grid(row=1,column=0)
+lbl4oaKind.grid(row=2,column=0)
+lblFullHouse.grid(row=3,column=0)
+lblFlush.grid(row=4,column=0)
+lblStraight.grid(row=5,column=0)
+lbl3oaKind.grid(row=6,column=0)
+lbl2Pairs.grid(row=7,column=0)
+lblPair.grid(row=8,column=0)
+lblHighCard.grid(row=9,column=0)
+lblSpacing.grid(row=10,column=0)
 
 
 selectionPane.pack(side=LEFT,fill=X)
 playerPane.pack(side=LEFT,fill=X)
-boardPane.pack(side=LEFT,fill=X)
+cardsInPlayPane.pack(side=LEFT,fill=X)
+combinationPane.pack(side=LEFT,fill=X)
 sideBar.pack(side=RIGHT,fill=X)
 
 # .pop() into funcion
 #
 
-def refreshUI():
+def refreshUI(player, board, deck):
+    checkPlayersHandRanking(player)
+    # Refreshing cards in play pane
     cardElems = [player_one.hand1, player_one.hand2, board_one.flop1, board_one.flop2, board_one.flop3, board_one.turn, board_one.river]
     uiCardElems = [btnPH1, btnPH2, btnBF1, btnBF2, btnBF3, btnBT, btnBR]
     for i in range(len(uiCardElems)):
@@ -180,7 +207,23 @@ def refreshUI():
             uiCardElems[i]['text'] = cardElems[i][0].show()
         else:
             uiCardElems[i]['text'] = ''
+    # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
+    # Refreshing combination pane
+    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    uiCombElems = [lbl2Pairs, lblPair, lblHighCard]
+    if onClickCheckPokerCombination(player, board, deck):
+        twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
+        uiCombElemsValue = [twoPairs, pair, hc]
+        uiCombElemsOuts = [twoPairsOs, pairOs, hcOs]
+        for i in range(len(uiCombElems)):
+            if uiCombElemsValue[i]:
+                uiCombElems[i]['fg']='#00ff00'
+            else:
+                uiCombElems[i]['fg']='#ff0000'
+    else:
+        for i in range(len(uiCombElems)):
+            uiCombElems[i]['fg']='#000000'
     # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
     # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
     window.geometry(window.geometry())
@@ -223,9 +266,8 @@ def cardsInPlayClicked(btn, player, board, deck):
             elif i == 6:
                 board.river.pop()
             deck_one.cards.append(selectedCard)
-    print(len(deck_one.cards))
-    checkPlayersHandRanking(player)
-    refreshUI()
+    #print(len(deck_one.cards))
+    refreshUI(player, board, deck)
     return True
 
 def selectionPaneClicked(btn, player, board, deck):
@@ -241,8 +283,7 @@ def selectionPaneClicked(btn, player, board, deck):
                 board.flop3 = []
                 board.turn = []
                 board.river = []
-                checkPlayersHandRanking(player)
-                refreshUI()
+                refreshUI(player, board, deck)
                 return False
     # Creating card from btn value
     selectedCard = btn2card(btn)
@@ -267,8 +308,7 @@ def selectionPaneClicked(btn, player, board, deck):
             elif i == 6:
                 board.river.pop()
             deck_one.cards.append(selectedCard)
-            checkPlayersHandRanking(player)
-            refreshUI()
+            refreshUI(player, board, deck)
             return True
     # If not, remove from deck and add to cardsInPlay
     for i in range(len(cardsInPlay)):
@@ -290,14 +330,31 @@ def selectionPaneClicked(btn, player, board, deck):
                 board.turn.append(selectedCard)
             elif i == 6:
                 board.river.append(selectedCard)
-            checkPlayersHandRanking(player)
-            refreshUI()
+            refreshUI(player, board, deck)
             return True
-    checkPlayersHandRanking(player)
-    refreshUI()
+    refreshUI(player, board, deck)
     return False
 
+def onClickCheckPokerCombination(player, board, deck):
+    # On click check if poker combinations are to be calculated
+    # Calculatio occurs when 2, 5, 6 or 7 cards are in play
+    cardsInPlay = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
+    cardSlot = [elem for elem in cardsInPlay if elem != []]
+    cardsInPlayFilledValue = 0
+    for i in range(len(cardsInPlay)):
+        if cardsInPlay[i]:
+            cardsInPlayFilledValue = i
+        else:
+            break
+    if cardsInPlayFilledValue == 1 or cardsInPlayFilledValue >= 4:
+        if cardsInPlayFilledValue == len(cardSlot) - 1:
+            return True
+    else:
+        print('>>> checkPokerCombination : cards slots KO')
+        return False
+
 def resetCardsInPlay(player, board, deck):
+    # Reset button to reset all cards in play
     cardsInPlay = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
     for i in range(len(cardsInPlay)):
         if cardsInPlay[i]:
@@ -310,13 +367,12 @@ def resetCardsInPlay(player, board, deck):
     board.turn = []
     board.river = []
     checkPlayersHandRanking(player)
-    refreshUI()
+    refreshUI(player, board, deck)
     print('> resetCardsInPlay')
     print(len(deck.cards))
     return True
 
 
-#window.after(5000, refreshUI)
 window.mainloop()
 
 

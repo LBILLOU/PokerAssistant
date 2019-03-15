@@ -1,5 +1,6 @@
 import math
 from classes import *
+from collections import Counter
 
 def chenFormula(cardA, cardB):
     # http://www.thepokerbank.com/strategy/basic/starting-hand-selection/chen-formula/
@@ -112,18 +113,19 @@ def createCardsToCheck(player,board):
     cardSlots = [elem for elem in allSlots if elem != []]
     # Turn list of list into list
     cardsInPlay = [card for cardList in cardSlots for card in cardList]
-    ###print('>>> createCardsToCheck : ', end = '')
-    ###print(cardsInPlay)
     return cardsInPlay
 
 def checkPokerCombination(player, board, deck):
-    checkHighCard(player, board, deck)
-    checkPair(player, board, deck)
+    twoPairs, twoPairsOs = check2Pairs(player, board, deck)
+    pair, pairOs = checkPair(player, board, deck)
+    hc, hcOs = checkHighCard(player, board, deck)
+    return twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
 
 def checkHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if cardsInPlay == []:
-        return False
+        print('>>> checkHighCard : False')
+        return False, False
     else:
         # Sorting cards from high to low
         cardsInPlay.sort(key=lambda card: card.value, reverse=True)
@@ -138,44 +140,83 @@ def checkHighCard(player, board, deck):
 def checkHighCardOuts(deck, highCard):
     outs = []
     for i in range(len(deck.cards)):
-        if deck.cards[i].value > highCard.value:
+        if deck.cards[i].value >= highCard.value:
             outs.append(deck.cards[i])
     return outs
 
 def checkPair(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if len(cardsInPlay) < 2:
-        return False
+        print('>>> checkPair : False')
+        return False, False
     else:
         cardsInPlay.sort(key=lambda card: card.value, reverse=True)
         for i in range(len(cardsInPlay)-1):
             if cardsInPlay[i].value == cardsInPlay[i+1].value:
                 pair = [cardsInPlay[i], cardsInPlay[i+1]]
-                outs = checkPairOuts(cardsInPlay, pair, deck)
+                outs = checkPairOuts(player, board, deck, pair)
                 print('>>> checkPair : ', end = '')
                 print(pair)
                 print('>>> checkPairOuts : ', end = '')
                 print(outs)
-                return pair
-        return False
+                return pair, outs
+        print('>>> checkPair : False')
+        return False, False
 
-def checkPairOuts(cardsInPlay, pair, deck):
+def checkPairOuts(player, board, deck, pair):
     outs = []
-    # Remove card lower or equal to pair
-    cardsInPlay2 = []
-    for card in cardsInPlay:
-        if card.value > pair[0].value:
-            cardsInPlay2.append(card)
-    #manage empty
-    print(cardsInPlay2)
+    cardsInPlay = createCardsToCheck(player,board)
+    # Seeking three of a kind
     for card in deck.cards:
-        for kard in cardsInPlay2:
+        if card.value == pair[0].value:
+            outs.append(card)
+        # Seeking second pair
+        for kard in cardsInPlay:
             if card.value == kard.value:
                 outs.append(card)
+    # Removing duplicates in outs
+    outs = list(set(outs))
+    # Sorting outs
+    outs.sort(key=lambda card: card.value, reverse=True)
     return outs
 
+def check2Pairs(player, board, deck):
+    cardsInPlay = createCardsToCheck(player,board)
+    if len(cardsInPlay) < 4:
+        print('>>> check2Pairs : False')
+        return False, False
+    else:
+        twoPairs = []
+        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
+        for i in range(len(cardsInPlay)-1):
+            if cardsInPlay[i].value == cardsInPlay[i+1].value:
+                twoPairs.append(cardsInPlay[i])
+                twoPairs.append(cardsInPlay[i+1])
+        # Removing duplicate pairs when 3 of a kind available for instance
+        twoPairs = list(set([i for i in twoPairs if twoPairs.count(i)==1]))
+        # All available pairs sorted
+        twoPairs.sort(key=lambda card: card.value, reverse=True)
+        # Return False if only one pair
+        if len(twoPairs) < 4:
+            print('>>> check2Pairs : False')
+            return False, False
+        # Else keep the 2 best pairs
+        else:
+            twoPairs = twoPairs[:4]
+            outs = check2PairsOuts(twoPairs, deck)
+            print('>>> check2Pairs : ', end = '')
+            print(twoPairs)
+            print('>>> check2PairsOuts : ', end = '')
+            print(outs)
+        return twoPairs, outs
 
-
+def check2PairsOuts(twoPairs, deck):
+    outs = []
+    # Seeking "Full" combination -> cards with same value as any of the pairs
+    for card in deck.cards:
+        if card.value == twoPairs[0].value or card.value == twoPairs[2].value:
+            outs.append(card)
+    return outs
 
 
 #
