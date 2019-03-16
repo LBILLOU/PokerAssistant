@@ -120,12 +120,12 @@ def checkPokerCombination(player, board, deck):
     # fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
     # fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
     # flush, flushOs = checkFlush(player, board, deck)
-    # straight, straightOs = checkStraight(player, board, deck)
+    straight, straightOs = checkStraight(player, board, deck)
     threeOfAKind, threeOfAKindOs = check3ofaKind(player, board, deck)
     twoPairs, twoPairsOs = check2Pairs(player, board, deck)
     pair, pairOs = checkPair(player, board, deck)
     hc, hcOs = checkHighCard(player, board, deck)
-    return threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
+    return straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
 
 def checkHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
@@ -153,7 +153,6 @@ def checkHighCardOuts(deck, highCard):
 def checkPair(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if len(cardsInPlay) < 2:
-        ###print('>>> checkPair : False')
         return False, False
     else:
         cardsInPlay.sort(key=lambda card: card.value, reverse=True)
@@ -166,7 +165,6 @@ def checkPair(player, board, deck):
                 ###print('>>> checkPairOuts : ', end = '')
                 ###print(outs)
                 return pair, outs
-        ###print('>>> checkPair : False')
         return False, False
 
 def checkPairOuts(player, board, deck, pair):
@@ -189,7 +187,6 @@ def checkPairOuts(player, board, deck, pair):
 def check2Pairs(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if len(cardsInPlay) < 4:
-        ###print('>>> check2Pairs : False')
         return False, False
     else:
         twoPairs = []
@@ -204,7 +201,6 @@ def check2Pairs(player, board, deck):
         twoPairs.sort(key=lambda card: card.value, reverse=True)
         # Return False if only one pair
         if len(twoPairs) < 4:
-            ###print('>>> check2Pairs : False')
             return False, False
         # Else keep the 2 best pairs
         else:
@@ -227,7 +223,6 @@ def check2PairsOuts(twoPairs, deck):
 def check3ofaKind(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if len(cardsInPlay) < 3:
-            print('>>> check3ofaKind : False')
             return False, False
     else:
         threeOfAKind = []
@@ -243,24 +238,23 @@ def check3ofaKind(player, board, deck):
         # Managing 2 three of a kind on board
         threeOfAKind = threeOfAKind[:3]
         if threeOfAKind == []:
-            print('>>> check3ofaKind : False')
             return False, False
         else:
-            outs = check3ofaKindOuts(threeOfAKind, player, board, deck)
-            print('>>> check3ofaKind : ', end = '')
-            print(threeOfAKind)
-            print('>>> check3ofaKindOuts : ', end = '')
-            print(outs)
+            outs = check3ofaKindOuts(player, board, deck, threeOfAKind)
+            #print('>>> check3ofaKind : ', end = '')
+            #print(threeOfAKind)
+            #print('>>> check3ofaKindOuts : ', end = '')
+            #print(outs)
             return threeOfAKind, outs
 
-def check3ofaKindOuts(threeOfAKind, player, board, deck):
+def check3ofaKindOuts(player, board, deck, threeOfAKind):
     outs = []
     # Seeking four of a kind
     for card in deck.cards:
         if threeOfAKind[0].value == card.value:
             outs.append(card)
     # Seeking Full House
-    cardsInPlay = createCardsToCheck(player,board)
+    cardsInPlay = createCardsToCheck(player, board)
     for card in cardsInPlay:
         if card.value != threeOfAKind[0].value:
             for kard in deck.cards:
@@ -268,16 +262,81 @@ def check3ofaKindOuts(threeOfAKind, player, board, deck):
                     outs.append(kard)
     return outs
 
-# def check3ofaKind(player, board, deck):
-#     threeOfAKind = ['n/a']
-#     outs = check3ofaKindOuts()
-#     print('>>> check3ofaKind : ', end = '')
-#     print(threeOfAKind)
-#     print('>>> check3ofaKindOuts : ', end = '')
+def checkStraight(player, board, deck):
+    cardsInPlay = createCardsToCheck(player, board)
+    if len(cardsInPlay) < 5:
+            return False, False
+    else:
+        straight = []
+        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
+        cardsInPlay2 = createCardsToCheck(player, board)
+        # Removing eventual pair
+        for i in range(len(cardsInPlay)-1):
+            if cardsInPlay[i].value == cardsInPlay[i+1].value:
+                cardsInPlay2.remove(cardsInPlay[i+1])
+                pass
+        # Looking for straight
+        for i in range(len(cardsInPlay2)-4):
+            if cardsInPlay2[i].value == cardsInPlay2[i+1].value+1 == cardsInPlay2[i+2].value+2 == cardsInPlay2[i+3].value+3 == cardsInPlay2[i+4].value+4:
+                straight.append(cardsInPlay2[i])
+                straight.append(cardsInPlay2[i+1])
+                straight.append(cardsInPlay2[i+2])
+                straight.append(cardsInPlay2[i+3])
+                straight.append(cardsInPlay2[i+4])
+                outs = checkStraightOuts(player, board, deck, straight)
+                print('>>> checkStraight : ', end = '')
+                print(straight)
+                print('>>> checkStraightOuts : ', end = '')
+                print(outs)
+                return straight, outs
+            else:
+                pass
+        return False, False
+
+def checkStraightOuts(player, board, deck, straight):
+    outs = []
+    hearts = 0
+    clubs = 0
+    diamonds = 0
+    spades = 0
+    straightFlushSuit = str()
+    # Seeking straight flush
+    for card in straight: # Seeking most represented suit
+        if card.suit == 'H':
+            hearts += 1
+        elif card.suit == 'C':
+            clubs += 1
+        elif card.suit == 'D':
+            diamonds += 1
+        elif card.suit == 'S':
+            spades += 1
+    if hearts == 4: # Setting most representee suit in var
+        straightFlushSuit = 'H'
+    elif clubs == 4:
+        straightFlushSuit = 'C'
+    elif diamonds == 4:
+        straightFlushSuit = 'D'
+    elif spades == 4:
+        straightFlushSuit = 'S'
+    else:
+        return outs
+    for card in straight: # Seeking outs as same value card as different suit card in current straight
+        if card.suit != straightFlushSuit:
+            for kard in deck.cards:
+                if kard.value == card.value:
+                    outs.append(kard)
+            return outs
+
+# def checkXXX(player, board, deck):
+#     XXX = ['n/a']
+#     outs = checkStraightOuts(player, board, deck, XXX)
+#     print('>>> checkXXX : ', end = '')
+#     print(straight)
+#     print('>>> checkXXXOuts : ', end = '')
 #     print(outs)
-#     return threeOfAKind, outs
+#     return XXX, outs
 #
-# def check3ofaKindOuts():
+# def checkXXXOuts(player, board, deck, XXX):
 #     outs = ['n/A']
 #     return outs
 
@@ -285,7 +344,6 @@ def check3ofaKindOuts(threeOfAKind, player, board, deck):
 # fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
 # fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
 # flush, flushOs = checkFlush(player, board, deck)
-# straight, straightOs = checkStraight(player, board, deck)
 
 #
 ##

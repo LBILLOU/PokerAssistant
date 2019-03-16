@@ -4,11 +4,13 @@ from functions import *
 from tkinter import *
 
 deck_one = Deck()
-player_one = Player('Player One')
+player_one = Player('Player 1')
 board_one = Board()
 
 window = Tk()
 window.title('Poker Assistant')
+
+cIPPbg = '#000000'
 
 selectionPane = Frame(window)
 playerPane = Frame(window)
@@ -128,13 +130,14 @@ btn2S.grid(row=13,column=3)
 # Player Pane UI
 btnPH1 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH1,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
 btnPH2 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH2,player_one,board_one,deck_one),width=3,highlightbackground='#03018c')
-btnPH1.grid(row=0,column=0)
-btnPH2.grid(row=0,column=1)
+btnPH1.grid(row=1,column=0)
+btnPH2.grid(row=1,column=1)
 
+
+lblPName = Label(playerPane,text=player_one.name.upper())
 lblPHR = Label(playerPane,text='0')
-lblPName = Label(playerPane,text=player_one.name)
-lblPHR.grid(row=1,columnspan=2)
-lblPName.grid(row=2,columnspan=2)
+lblPName.grid(row=0,columnspan=2)
+lblPHR.grid(row=2,columnspan=2)
 
 # Cards in Play Pane UI
 btnBF1 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
@@ -142,20 +145,21 @@ btnBF2 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF2,
 btnBF3 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF3,player_one,board_one,deck_one),width=3,highlightbackground='#54008c')
 btnBT = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBT,player_one,board_one,deck_one),width=3,highlightbackground='#89008c')
 btnBR = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBR,player_one,board_one,deck_one),width=3,highlightbackground='#c100ab')
-btnBF1.grid(row=0,column=0)
-btnBF2.grid(row=0,column=1)
-btnBF3.grid(row=0,column=2)
-btnBT.grid(row=0,column=3)
-btnBR.grid(row=0,column=4)
+btnBF1.grid(row=1,column=0)
+btnBF2.grid(row=1,column=1)
+btnBF3.grid(row=1,column=2)
+btnBT.grid(row=1,column=3)
+btnBR.grid(row=1,column=4)
 
+lblBoardName = Label(cardsInPlayPane,text='BOARD')
+lblBoardName.grid(row=0,columnspan=5)
 lblBFlop = Label(cardsInPlayPane,text='Flop')
-lblBFlop.grid(row=1,column=0,columnspan=3)
+lblBFlop.grid(row=2,column=0,columnspan=3)
 lblBTurn = Label(cardsInPlayPane,text='Turn')
-lblBTurn.grid(row=1,column=3,columnspan=1)
+lblBTurn.grid(row=2,column=3,columnspan=1)
 lblBRiver = Label(cardsInPlayPane,text='River')
-lblBRiver.grid(row=1,column=4,columnspan=1)
-lblBoardName = Label(cardsInPlayPane,text='Board')
-lblBoardName.grid(row=2,columnspan=5)
+lblBRiver.grid(row=2,column=4,columnspan=1)
+
 
 # Side Bar UI
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
@@ -164,17 +168,17 @@ btnReset = Button(sideBar,text='Check',command=lambda:check3ofaKind(player_one,b
 btnReset.grid(row=1,column=0)
 
 # Combination Panu UI
-lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=12,anchor=W)
-lblStrFlush = Label(combinationPane,text='Straight Flush',width=12)
-lbl4oaKind = Label(combinationPane,text='Four of a Kind',width=12)
-lblFullHouse = Label(combinationPane,text='Full House',width=12)
-lblFlush = Label(combinationPane,text='Flush',width=12)
-lblStraight = Label(combinationPane,text='Straight',width=12)
-lbl3oaKind = Label(combinationPane,text='Three of a kind',width=12)
-lbl2Pairs = Label(combinationPane,text='Two Pairs',width=12)
-lblPair = Label(combinationPane,text='Pair',width=12)
-lblHighCard = Label(combinationPane,text='High Card',width=12)
-lblSpacing = Label(combinationPane,text='',width=12)
+lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=14,anchor=W)
+lblStrFlush = Label(combinationPane,text='Straight Flush',width=14,anchor=W)
+lbl4oaKind = Label(combinationPane,text='Four of a Kind',width=14,anchor=W)
+lblFullHouse = Label(combinationPane,text='Full House',width=14,anchor=W)
+lblFlush = Label(combinationPane,text='Flush',width=14,anchor=W)
+lblStraight = Label(combinationPane,text='Straight',width=14,anchor=W)
+lbl3oaKind = Label(combinationPane,text='Three of a Kind',width=14,anchor=W)
+lbl2Pairs = Label(combinationPane,text='Two Pairs',width=14,anchor=W)
+lblPair = Label(combinationPane,text='Pair',width=14,anchor=W)
+lblHighCard = Label(combinationPane,text='High Card',width=14,anchor=W)
+lblSpacing = Label(combinationPane,text='',anchor=W)
 lblRoyalFlush.grid(row=0,column=0)
 lblStrFlush.grid(row=1,column=0)
 lbl4oaKind.grid(row=2,column=0)
@@ -210,12 +214,12 @@ def refreshUI(player, board, deck):
     # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
     # Refreshing combination pane
-    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight
-    uiCombElems = [lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush
+    uiCombElems = [lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
     if onClickCheckPokerCombination(player, board, deck):
-        threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
-        uiCombElemsValue = [threeOfAKind, twoPairs, pair, hc]
-        uiCombElemsOuts = [threeOfAKindOs, twoPairsOs, pairOs, hcOs]
+        straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
+        uiCombElemsValue = [straight, threeOfAKind, twoPairs, pair, hc]
+        uiCombElemsOuts = [straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
         for i in range(len(uiCombElems)):
             if uiCombElemsValue[i]:
                 uiCombElems[i]['fg']='#00ff00'
