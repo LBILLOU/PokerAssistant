@@ -160,7 +160,7 @@ lblBoardName.grid(row=2,columnspan=5)
 # Side Bar UI
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:check2Pairs(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
+btnReset = Button(sideBar,text='Check',command=lambda:check3ofaKind(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=1,column=0)
 
 # Combination Panu UI
@@ -210,12 +210,12 @@ def refreshUI(player, board, deck):
     # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
     # Refreshing combination pane
-    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
-    uiCombElems = [lbl2Pairs, lblPair, lblHighCard]
+    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight
+    uiCombElems = [lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
     if onClickCheckPokerCombination(player, board, deck):
-        twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
-        uiCombElemsValue = [twoPairs, pair, hc]
-        uiCombElemsOuts = [twoPairsOs, pairOs, hcOs]
+        threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
+        uiCombElemsValue = [threeOfAKind, twoPairs, pair, hc]
+        uiCombElemsOuts = [threeOfAKindOs, twoPairsOs, pairOs, hcOs]
         for i in range(len(uiCombElems)):
             if uiCombElemsValue[i]:
                 uiCombElems[i]['fg']='#00ff00'
@@ -341,17 +341,17 @@ def onClickCheckPokerCombination(player, board, deck):
     cardsInPlay = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
     cardSlot = [elem for elem in cardsInPlay if elem != []]
     cardsInPlayFilledValue = 0
+    # Making sure slots are filled consecutively
     for i in range(len(cardsInPlay)):
         if cardsInPlay[i]:
             cardsInPlayFilledValue = i
         else:
             break
-    if cardsInPlayFilledValue == 1 or cardsInPlayFilledValue >= 4:
-        if cardsInPlayFilledValue == len(cardSlot) - 1:
-            return True
+    if cardsInPlayFilledValue == len(cardSlot) - 1:
+             return True
     else:
-        print('>>> checkPokerCombination : cards slots KO')
-        return False
+         print('>>> checkPokerCombination : cards slots KO')
+         return False
 
 def resetCardsInPlay(player, board, deck):
     # Reset button to reset all cards in play
