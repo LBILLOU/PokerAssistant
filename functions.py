@@ -270,6 +270,7 @@ def checkStraight(player, board, deck):
         straight = []
         cardsInPlay.sort(key=lambda card: card.value, reverse=True)
         cardsInPlay2 = createCardsToCheck(player, board)
+        cardsInPlay2.sort(key=lambda card: card.value, reverse=True)
         # Removing eventual pair
         for i in range(len(cardsInPlay)-1):
             if cardsInPlay[i].value == cardsInPlay[i+1].value:
