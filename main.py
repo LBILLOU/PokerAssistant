@@ -214,12 +214,12 @@ def refreshUI(player, board, deck):
     # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
     # Refreshing combination pane
-    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush
-    uiCombElems = [lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse
+    uiCombElems = [lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
     if onClickCheckPokerCombination(player, board, deck):
-        straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
-        uiCombElemsValue = [straight, threeOfAKind, twoPairs, pair, hc]
-        uiCombElemsOuts = [straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
+        flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
+        uiCombElemsValue = [flush, straight, threeOfAKind, twoPairs, pair, hc]
+        uiCombElemsOuts = [flushOs, straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
         for i in range(len(uiCombElems)):
             if uiCombElemsValue[i]:
                 uiCombElems[i]['fg']='#00ff00'

@@ -119,14 +119,264 @@ def checkPokerCombination(player, board, deck):
     # straightFlush, straightFlushOs = checkStraightFlush(player, board, deck)
     # fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
     # fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
-    # flush, flushOs = checkFlush(player, board, deck)
+    flush, flushOs = checkFlush(player, board, deck)
     straight, straightOs = checkStraight(player, board, deck)
     threeOfAKind, threeOfAKindOs = check3ofaKind(player, board, deck)
     twoPairs, twoPairsOs = check2Pairs(player, board, deck)
     pair, pairOs = checkPair(player, board, deck)
     hc, hcOs = checkHighCard(player, board, deck)
-    return straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
+    return flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
 
+# Functions to return all basic cards combinations
+def showPairs(cardslist):
+    # Funtion that returns all pairs from a given cardsList
+    # If no pair possible return false
+    if len(cardslist) < 2:
+        return False
+    else:
+        pairs = list()
+        # Sorting cards from high to low
+        cardslist.sort(key=lambda card: card.value, reverse=True)
+        # Adding all pairs to the return variable
+        for i in range(len(cardslist)-1):
+            if cardslist[i].value == cardslist[i+1].value:
+                pairs.append(cardslist[i])
+                pairs.append(cardslist[i+1])
+        # If no pair return false
+        if len(pairs) < 2:
+            return False
+        else:
+            # Removing "false" pairs in case of 3/4 of a kind
+            pairs2 = pairs.copy()
+            # Creating dict w/ card value and count
+            counter = Counter(card.value for card in pairs)
+            # Remove cards with same value appearing more than twice in list
+            for key, value in counter.items():
+                if value > 2:
+                    for card in pairs:
+                        if card.value == key:
+                            pairs2.remove(card)
+            return pairs2
+
+def show3ofaKind(cardslist):
+    # Funtion that returns all "3 of a kind" from a given cardsList
+    # If no "3 of a kind" possible return false
+    if len(cardslist) < 3:
+        return False
+    else:
+        threeofakind = list()
+        # Sorting cards from high to low
+        cardslist.sort(key=lambda card: card.value, reverse=True)
+        # Adding all "3 of a kind" to the return variable
+        for i in range(len(cardslist)-2):
+            if cardslist[i].value == cardslist[i+1].value == cardslist[i+2].value:
+                threeofakind.append(cardslist[i])
+                threeofakind.append(cardslist[i+1])
+                threeofakind.append(cardslist[i+2])
+        # If no "3 of a kind" return false
+        if len(threeofakind) < 3:
+            return False
+        else:
+            # Removing "false" pairs in case of 3/4 of a kind
+            threeofakind2 = threeofakind.copy()
+            # Creating dict w/ card value and count
+            counter = Counter(card.value for card in threeofakind)
+            # Remove cards with same value appearing more than twice in list
+            for key, value in counter.items():
+                if value > 3:
+                    for card in threeofakind:
+                        if card.value == key:
+                            threeofakind2.remove(card)
+            print(threeofakind2)
+            return threeofakind2
+
+def show4ofaKind(cardslist):
+    # Funtion that returns all "4 of a kind" from a given cardsList
+    # If no "4 of a kind" possible return false
+    if len(cardslist) < 4:
+        return False
+    else:
+        fourofakind = list()
+        # Sorting cards from high to low
+        cardslist.sort(key=lambda card: card.value, reverse=True)
+        # Adding all "4 of a kind" to the return variable
+        for i in range(len(cardslist)-3):
+            if cardslist[i].value == cardslist[i+1].value == cardslist[i+2].value == cardslist[i+3].value:
+                fourofakind.append(cardslist[i])
+                fourofakind.append(cardslist[i+1])
+                fourofakind.append(cardslist[i+2])
+                fourofakind.append(cardslist[i+3])
+        # If no "4 of a kind" return false
+        if len(fourofakind) < 4:
+            return False
+        else:
+            print(fourofakind)
+            return fourofakind
+
+def showFlush(cardslist):
+    # Function that returns all (can be more than 5) Flush cards from a given cardsList
+    # If no Flush possible return false
+    if len(cardslist) < 5:
+        return False
+    else:
+        flush = list()
+        # Creating dict w/ card suit and count
+        counter = Counter(card.suit for card in cardslist)
+        flushSuit = ''
+        for key, value in counter.items():
+            if value >= 5:
+                flushSuit = key
+        for card in cardslist:
+            if card.suit == flushSuit:
+                flush.append(card)
+        # Sorting cards from high to low
+        flush.sort(key=lambda card: card.value, reverse=True)
+        return flush
+
+def showStraight(cardslist):
+    # Function that returns all (can be more than 5) straight cards from a given cardsList
+    # If no straight possible return false
+    if len(cardslist) < 5:
+        return False
+    else:
+        straight = list()
+        # Issue with pairs/3ofakind, keeping card with most common suit the cardsList
+        #for later combination of straight and flush comparaison to evaluate straight flush
+        # Creating dict w/ card suit and count to manage pairs/show3ofaKind
+        counter = Counter(card.suit for card in cardslist)
+        mostSuit = '' # Setting default value to Hearts
+        # Defining most common suit in case of a flush still possible
+        for key, value in counter.items():
+            if len(cardslist) == 5 and value == 3:
+                mostSuit = key
+            elif len(cardslist) == 6 and value == 4:
+                mostSuit = key
+            else:
+                pass
+        cardslist2 = cardslist.copy()
+        # Removing duplicate cards (with same value), keeping most common suit of card if possible
+        for i in range(len(cardslist)-1):
+            if cardslist[i].value == cardslist[i+1].value:
+                if mostSuit and cardslist[i+1].suit == mostSuit:
+                    cardslist2.remove(cardslist[i])
+                else:
+                    cardslist2.remove(cardslist[i+1])
+        # Sorting cards from high to low
+        cardslist2.sort(key=lambda card: card.value, reverse=True)
+        # Looking for straight
+        for i in range(len(cardslist2)-4):
+            if cardslist2[i].value == cardslist2[i+1].value+1 == cardslist2[i+2].value+2 == cardslist2[i+3].value+3 == cardslist2[i+4].value+4:
+                temp = [cardslist2[i], cardslist2[i+1], cardslist2[i+2], cardslist2[i+3], cardslist2[i+4]]
+                for card in temp:
+                    if card not in straight:
+                        straight.append(card)
+        return straight
+
+# Functions to return outs for all cards combinations
+def checkOutsForHighCard(cardslist, deck):
+    # higher cards (hand/allcards...?)
+    # higher straight (straightCards)
+    # higher flush straight (straightCards + flush suit)
+    # higher flush (flushCards + flush suit)
+    outs = list()
+    cardslist.sort(key=lambda card: card.value, reverse=True)
+    highCard = cardslist[0]
+    for i in range(len(deck.cards)):
+        if deck.cards[i].value > highCard.value:
+            outs.append(deck.cards[i])
+    outs.sort(key=lambda card: card.value, reverse=True)
+    return outs
+
+def checkOutsForPair(cardslist, deck):
+    # high -> pairs (all cards)
+    # pair -> 2 pairs (all cards except pair)
+    # 3ofakind -> fullhouse (all cards except 3oaKind)
+    outs = list()
+    cardslist.sort(key=lambda card: card.value, reverse=True)
+    for card in deck.cards:
+        for kard in cardslist:
+            if card.value == kard.value:
+                outs.append(card)
+    outs.sort(key=lambda card: card.value, reverse=True)
+    return outs
+
+def checkOutsFor3or4ofaKind(cardslist, deck):
+    # pair -> 3ofakind (pair)
+    # 2 pairs -> full house (2pairs)
+    # 3ofaKind -> 4ofaKind (3ofakind)
+    if len(cardslist) < 2:
+        return False
+    outs = list()
+    cardslist.sort(key=lambda card: card.value, reverse=True)
+    for card in deck.cards:
+        for kard in cardslist:
+            if card.value == kard.value:
+                outs.append(card)
+    outs = list(set(outs))
+    outs.sort(key=lambda card: card.value, reverse=True)
+    print(outs)
+    return outs
+
+def checkOutsForStraight(cardslist, deck):
+    # high, pair, 2pairs, 3ofakind -> straight ?
+    outs = list()
+    cardslist.sort(key=lambda card: card.value, reverse=True)
+    cardslist2 = cardslist.copy()
+    # Removing eventual pair/3ofakind
+    for i in range(len(cardslist)-1):
+        if cardslist[i].value == cardslist[i+1].value:
+            cardslist2.remove(cardslist[i+1])
+    # Need 4 cards at least to create a straight with an out.
+    if len(cardslist2) < 4:
+        return False
+    # Case of a continuous 4 cards straight
+    for i in range(len(cardslist2)-3):
+        if cardslist2[i].value == cardslist2[i+1].value+1 == cardslist2[i+2].value+2 == cardslist2[i+3].value+3:
+            high = cardslist2[i]
+            low = cardslist2[i+3]
+            for card in deck.cards:
+                if card.value == high.value + 1 or card.value == low.value - 1:
+                    outs.append(card)
+            return outs
+    # Case of straight with a missing card
+    for i in range(len(cardslist2)-3):
+        # Case 1.111
+        if cardslist2[i].value  == cardslist2[i+1].value+2 == cardslist2[i+2].value+3 == cardslist2[i+3].value+4:
+            aboveMissing = cardslist2[i]
+        # Case 11.11
+        elif cardslist2[i].value == cardslist2[i+1].value+1 == cardslist2[i+2].value+3 == cardslist2[i+3].value+4:
+            aboveMissing = cardslist2[i+1]
+        # Case 111.1
+        elif cardslist2[i].value == cardslist2[i+1].value+1 == cardslist2[i+2].value+2 == cardslist2[i+3].value+4:
+            aboveMissing = cardslist2[i+2]
+        for card in deck.cards:
+            if card.value == aboveMissing.value - 1:
+                outs.append(card)
+        return outs
+
+def checkOutsForFlush(cardslist, deck):
+    # high, pair, 2pairs, 3ofakind, straight -> flush ?
+    if len(cardslist) < 4:
+        return False
+    outs = list()
+    # Searching for 4 cards of same suit
+    flushSuit = ''
+    counter = Counter(card.suit for card in cardslist)
+    for key, value in counter.items():
+        if value == 4:
+            flushSuit = key
+    # Adding same suit cards to outs
+    if flushSuit:
+        for card in deck.cards:
+            if card.suit == flushSuit:
+                outs.append(card)
+    # Sorting cards from high to low
+    outs.sort(key=lambda card: card.value, reverse=True)
+    return outs
+
+
+
+# Functions to return all (10) specific cards combinations and outs
 def checkHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if cardsInPlay == []:
@@ -146,7 +396,7 @@ def checkHighCard(player, board, deck):
 def checkHighCardOuts(deck, highCard):
     outs = []
     for i in range(len(deck.cards)):
-        if deck.cards[i].value >= highCard.value:
+        if deck.cards[i].value > highCard.value:
             outs.append(deck.cards[i])
     return outs
 
@@ -285,9 +535,9 @@ def checkStraight(player, board, deck):
                 straight.append(cardsInPlay2[i+3])
                 straight.append(cardsInPlay2[i+4])
                 outs = checkStraightOuts(player, board, deck, straight)
-                print('>>> checkStraight : ', end = '')
-                print(straight)
-                print('>>> checkStraightOuts : ', end = '')
+                #print('>>> checkStraight : ', end = '')
+                #print(straight)
+                #print('>>> checkStraightOuts : ', end = '')
                 print(outs)
                 return straight, outs
             else:
@@ -328,9 +578,30 @@ def checkStraightOuts(player, board, deck, straight):
                     outs.append(kard)
             return outs
 
+def checkFlush(player, board, deck):
+    flush = ['n/a']
+    outs = checkFlushOuts(player, board, deck, flush)
+    print('-------------')
+    checkOutsForStraight(createCardsToCheck(player, board), deck)
+    print('-------------')
+    print('>>> checkXXX : ', end = '')
+    print(flush)
+    print('>>> checkXXXOuts : ', end = '')
+    print(outs)
+    return flush, outs
+
+def checkFlushOuts(player, board, deck, flush):
+    outs = ['n/A']
+    return outs
+
+# straightFlush, straightFlushOs = checkStraightFlush(player, board, deck)
+# fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
+# fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
+# flush, flushOs = checkFlush(player, board, deck)
+
 # def checkXXX(player, board, deck):
 #     XXX = ['n/a']
-#     outs = checkStraightOuts(player, board, deck, XXX)
+#     outs = checkXXXOuts(player, board, deck, XXX)
 #     print('>>> checkXXX : ', end = '')
 #     print(straight)
 #     print('>>> checkXXXOuts : ', end = '')
@@ -341,10 +612,9 @@ def checkStraightOuts(player, board, deck, straight):
 #     outs = ['n/A']
 #     return outs
 
-# straightFlush, straightFlushOs = checkStraightFlush(player, board, deck)
-# fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
-# fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
-# flush, flushOs = checkFlush(player, board, deck)
+#checkOutsForStraight !!!
+# warning couleur
+# warning suite
 
 #
 ##
