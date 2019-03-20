@@ -2,6 +2,37 @@ import math
 from classes import *
 from collections import Counter
 
+def btn2card(btn):
+    # Generate card from Button
+    if len(btn['text']) == 2:
+        value = btn['text'][0]
+    elif len(btn['text']) == 3:
+        value = btn['text'][0:2]
+    else:
+        return ''
+    # Managing transcodification
+    if value == 'A':
+        value = 14
+    elif value == 'K':
+        value = 13
+    elif value == 'Q':
+        value = 12
+    elif value == 'J':
+        value = 11
+    else:
+        value = int(value)
+    suit = btn['text'][-1]
+    # Managing transcodification
+    if suit == '♥':
+        suit = 'H'
+    elif suit == '♣':
+        suit = 'C'
+    elif suit == '♦':
+        suit = 'D'
+    elif suit == '♠':
+        suit = 'S'
+    return Card(value, suit)
+
 def chenFormula(cardA, cardB):
     # http://www.thepokerbank.com/strategy/basic/starting-hand-selection/chen-formula/
     # Initializing score
@@ -69,43 +100,12 @@ def chen2rank(chenScore):
     else:
         return 0
 
-def checkPlayersHandRanking(player):
+def definePlayersHandRanking(player):
     if player.hand1 and player.hand2:
         player.handRank = chen2rank(chenFormula(player.hand1[0], player.hand2[0]))
     else:
         player.handRank = int()
     return True
-
-def btn2card(btn):
-    # Generate card from Button
-    if len(btn['text']) == 2:
-        value = btn['text'][0]
-    elif len(btn['text']) == 3:
-        value = btn['text'][0:2]
-    else:
-        return ''
-    # Managing transcodification
-    if value == 'A':
-        value = 14
-    elif value == 'K':
-        value = 13
-    elif value == 'Q':
-        value = 12
-    elif value == 'J':
-        value = 11
-    else:
-        value = int(value)
-    suit = btn['text'][-1]
-    # Managing transcodification
-    if suit == '♥':
-        suit = 'H'
-    elif suit == '♣':
-        suit = 'C'
-    elif suit == '♦':
-        suit = 'D'
-    elif suit == '♠':
-        suit = 'S'
-    return Card(value, suit)
 
 def createCardsToCheck(player,board):
     allSlots = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
@@ -115,20 +115,26 @@ def createCardsToCheck(player,board):
     cardsInPlay = [card for cardList in cardSlots for card in cardList]
     return cardsInPlay
 
+# Function which returns highest combination and outs
 def checkPokerCombination(player, board, deck):
-    # straightFlush, straightFlushOs = checkStraightFlush(player, board, deck)
-    # fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
-    # fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
-    flush, flushOs = checkFlush(player, board, deck)
-    straight, straightOs = checkStraight(player, board, deck)
-    threeOfAKind, threeOfAKindOs = check3ofaKind(player, board, deck)
-    twoPairs, twoPairsOs = check2Pairs(player, board, deck)
-    pair, pairOs = checkPair(player, board, deck)
-    hc, hcOs = checkHighCard(player, board, deck)
-    return flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs
+    bestCombination = []
+    combinationsFunctionsList = [isRoyalFlush, isStraightFlush, is4ofaKind, isFullHouse, isFlush, isStraight, is3ofaKind, is2Pairs, isPair, isHighCard]
+    # outsFunctionsList = [outs for royal flush, ..., outs for high card]
+    for i in range(len(combinationsFunctionsList)):
+        #### /! Double function exec ###
+        if combinationsFunctionsList[i](player, board, deck) is False:
+            bestCombination.append(False)
+            # search outs
+        else:
+            bestCombination.append(combinationsFunctionsList[i](player, board, deck))
+            # search outs
+            print(bestCombination)
+            return True
+    print('ERROR : No poker combination found')
+    return False
 
-# Functions to return all basic cards combinations
-def showPairs(cardslist):
+# Functions to return generic cards combinations
+def searchForPairs(cardslist):
     # Funtion that returns all pairs from a given cardsList
     # If no pair possible return false
     if len(cardslist) < 2:
@@ -158,7 +164,7 @@ def showPairs(cardslist):
                             pairs2.remove(card)
             return pairs2
 
-def show3ofaKind(cardslist):
+def searchFor3ofaKind(cardslist):
     # Funtion that returns all "3 of a kind" from a given cardsList
     # If no "3 of a kind" possible return false
     if len(cardslist) < 3:
@@ -187,10 +193,9 @@ def show3ofaKind(cardslist):
                     for card in threeofakind:
                         if card.value == key:
                             threeofakind2.remove(card)
-            print(threeofakind2)
             return threeofakind2
 
-def show4ofaKind(cardslist):
+def searchFor4ofaKind(cardslist):
     # Funtion that returns all "4 of a kind" from a given cardsList
     # If no "4 of a kind" possible return false
     if len(cardslist) < 4:
@@ -210,30 +215,9 @@ def show4ofaKind(cardslist):
         if len(fourofakind) < 4:
             return False
         else:
-            print(fourofakind)
             return fourofakind
 
-def showFlush(cardslist):
-    # Function that returns all (can be more than 5) Flush cards from a given cardsList
-    # If no Flush possible return false
-    if len(cardslist) < 5:
-        return False
-    else:
-        flush = list()
-        # Creating dict w/ card suit and count
-        counter = Counter(card.suit for card in cardslist)
-        flushSuit = ''
-        for key, value in counter.items():
-            if value >= 5:
-                flushSuit = key
-        for card in cardslist:
-            if card.suit == flushSuit:
-                flush.append(card)
-        # Sorting cards from high to low
-        flush.sort(key=lambda card: card.value, reverse=True)
-        return flush
-
-def showStraight(cardslist):
+def searchForStraight(cardslist):
     # Function that returns all (can be more than 5) straight cards from a given cardsList
     # If no straight possible return false
     if len(cardslist) < 5:
@@ -242,17 +226,20 @@ def showStraight(cardslist):
         straight = list()
         # Issue with pairs/3ofakind, keeping card with most common suit the cardsList
         #for later combination of straight and flush comparaison to evaluate straight flush
-        # Creating dict w/ card suit and count to manage pairs/show3ofaKind
+        # Creating dict w/ card suit and count to manage pairs/3ofaKind
         counter = Counter(card.suit for card in cardslist)
         mostSuit = '' # Setting default value to Hearts
         # Defining most common suit in case of a flush still possible
         for key, value in counter.items():
-            if len(cardslist) == 5 and value == 3:
+            if len(cardslist) == 5 and value >= 3:
                 mostSuit = key
-            elif len(cardslist) == 6 and value == 4:
+            elif len(cardslist) == 6 and value >= 4:
+                mostSuit = key
+            elif len(cardslist) == 7 and value >= 5:
                 mostSuit = key
             else:
                 pass
+        cardslist.sort(key=lambda card: card.value, reverse=True)
         cardslist2 = cardslist.copy()
         # Removing duplicate cards (with same value), keeping most common suit of card if possible
         for i in range(len(cardslist)-1):
@@ -270,9 +257,31 @@ def showStraight(cardslist):
                 for card in temp:
                     if card not in straight:
                         straight.append(card)
-        return straight
+                return straight
+        return False
 
-# Functions to return outs for all cards combinations
+def searchForFlush(cardslist):
+    # Function that returns all (can be more than 5) Flush cards from a given cardsList
+    # If no Flush possible return false
+    if len(cardslist) < 5:
+        return False
+    else:
+        flush = list()
+        # Creating dict w/ card suit and count
+        counter = Counter(card.suit for card in cardslist)
+        flushSuit = ''
+        for key, value in counter.items():
+            if value >= 5:
+                flushSuit = key
+                for card in cardslist:
+                    if card.suit == flushSuit:
+                        flush.append(card)
+                # Sorting cards from high to low
+                flush.sort(key=lambda card: card.value, reverse=True)
+                return flush
+        return False
+
+# Functions to return outs for generic cards combinations
 def checkOutsForHighCard(cardslist, deck):
     # higher cards (hand/allcards...?)
     # higher straight (straightCards)
@@ -314,7 +323,6 @@ def checkOutsFor3or4ofaKind(cardslist, deck):
                 outs.append(card)
     outs = list(set(outs))
     outs.sort(key=lambda card: card.value, reverse=True)
-    print(outs)
     return outs
 
 def checkOutsForStraight(cardslist, deck):
@@ -374,24 +382,108 @@ def checkOutsForFlush(cardslist, deck):
     outs.sort(key=lambda card: card.value, reverse=True)
     return outs
 
-
-
-# Functions to return all (10) specific cards combinations and outs
-def checkHighCard(player, board, deck):
+# Functions that return poker combinations if true
+# (using the above searchForXxx functions)
+def isHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if cardsInPlay == []:
-        print('>>> checkHighCard : False')
-        return False, False
+        return False
     else:
         # Sorting cards from high to low
         cardsInPlay.sort(key=lambda card: card.value, reverse=True)
         highCard = cardsInPlay[0]
-        outs = checkHighCardOuts(deck, highCard)
-        #print('>>> checkHighCard : ', end = '')
-        #print(highCard)
-        #print('>>> checkHighCardOuts : ', end = '')
-        #print(outs)
-    return highCard, outs
+        return highCard
+
+def isPair(player, board, deck):
+    allPairs = searchForPairs(createCardsToCheck(player,board))
+    if allPairs != False:
+        if len(allPairs) >= 2:
+            bestPair = allPairs[:2]
+            return bestPair
+    return False
+
+def is2Pairs(player, board, deck):
+    allPairs = searchForPairs(createCardsToCheck(player,board))
+    if allPairs != False:
+        if len(allPairs) >= 4:
+            best2Pairs = allPairs[:4]
+            return best2Pairs
+    return False
+
+def is3ofaKind(player, board, deck):
+    all3ofaKind = searchFor3ofaKind(createCardsToCheck(player,board))
+    if all3ofaKind != False:
+        if len(all3ofaKind) >= 3:
+            best3ofaKind = all3ofaKind[:3]
+            return best3ofaKind
+    return False
+
+def isStraight(player, board, deck):
+    allStraight = searchForStraight(createCardsToCheck(player,board))
+    if allStraight != False:
+        straight = allStraight[:5]
+        return straight
+    return False
+
+def isFlush(player, board, deck):
+    allFlush = searchForFlush(createCardsToCheck(player,board))
+    if allFlush !=False:
+        flush = allFlush[:5]
+        return flush
+    return False
+
+def isFullHouse(player, board, deck):
+    pair = isPair(player, board, deck)
+    threeOfAKind = searchFor3ofaKind(createCardsToCheck(player,board))
+    if pair and threeOfAKind:
+        fullHouse = []
+        fullHouse += threeOfAKind
+        fullHouse += pair
+        return fullHouse
+    # Case of multiple 3 of a kind on board
+    elif threeOfAKind:
+        fullHouse2 = []
+        fullHouse2 = threeOfAKind[:5]
+        return fullHouse2
+    else:
+        return False
+
+def is4ofaKind(player, board, deck):
+    all4ofaKind = searchFor4ofaKind(createCardsToCheck(player,board))
+    if all4ofaKind != False:
+        return all4ofaKind
+    return False
+
+def isStraightFlush(player, board, deck):
+    allStraight = searchForStraight(createCardsToCheck(player,board))
+    allFlush = searchForFlush(createCardsToCheck(player,board))
+    if allStraight != False and allFlush !=False:
+        # Case len(allFlush) == 7
+        if len(allFlush) == 7:
+            straightFlush = allStraight[:5]
+            return straightFlush
+        # Case len(allFlush) == 5 or 6
+        elif len(allFlush) == 6 or len(allFlush) == 5:
+            for i in [5, 6]: # 5 ou 6
+                for j in [5, 6, 7]: # 5 6 ou 7
+                    if allFlush[i-5:i] == allStraight[j-5:j]:
+                        straightFlush = allStraight[j-5:j]
+                        return straightFlush
+        return False
+    else:
+        return False
+
+def isRoyalFlush(player, board, deck):
+    straightFlush = isStraightFlush(player, board, deck)
+    if straightFlush != False:
+        if straightFlush[0].value == 14:
+            return straightFlush
+    return False
+
+
+
+#########################
+#########################
 
 def checkHighCardOuts(deck, highCard):
     outs = []
@@ -399,23 +491,6 @@ def checkHighCardOuts(deck, highCard):
         if deck.cards[i].value > highCard.value:
             outs.append(deck.cards[i])
     return outs
-
-def checkPair(player, board, deck):
-    cardsInPlay = createCardsToCheck(player,board)
-    if len(cardsInPlay) < 2:
-        return False, False
-    else:
-        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
-        for i in range(len(cardsInPlay)-1):
-            if cardsInPlay[i].value == cardsInPlay[i+1].value:
-                pair = [cardsInPlay[i], cardsInPlay[i+1]]
-                outs = checkPairOuts(player, board, deck, pair)
-                ###print('>>> checkPair : ', end = '')
-                ###print(pair)
-                ###print('>>> checkPairOuts : ', end = '')
-                ###print(outs)
-                return pair, outs
-        return False, False
 
 def checkPairOuts(player, board, deck, pair):
     outs = []
@@ -434,34 +509,6 @@ def checkPairOuts(player, board, deck, pair):
     outs.sort(key=lambda card: card.value, reverse=True)
     return outs
 
-def check2Pairs(player, board, deck):
-    cardsInPlay = createCardsToCheck(player,board)
-    if len(cardsInPlay) < 4:
-        return False, False
-    else:
-        twoPairs = []
-        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
-        for i in range(len(cardsInPlay)-1):
-            if cardsInPlay[i].value == cardsInPlay[i+1].value:
-                twoPairs.append(cardsInPlay[i])
-                twoPairs.append(cardsInPlay[i+1])
-        # Removing duplicate pairs when 3 of a kind available for instance
-        twoPairs = list(set([i for i in twoPairs if twoPairs.count(i)==1]))
-        # All available pairs sorted
-        twoPairs.sort(key=lambda card: card.value, reverse=True)
-        # Return False if only one pair
-        if len(twoPairs) < 4:
-            return False, False
-        # Else keep the 2 best pairs
-        else:
-            twoPairs = twoPairs[:4]
-            outs = check2PairsOuts(twoPairs, deck)
-            ###print('>>> check2Pairs : ', end = '')
-            ###print(twoPairs)
-            ###print('>>> check2PairsOuts : ', end = '')
-            ###print(outs)
-        return twoPairs, outs
-
 def check2PairsOuts(twoPairs, deck):
     outs = []
     # Seeking "Full" combination -> cards with same value as any of the pairs
@@ -469,33 +516,6 @@ def check2PairsOuts(twoPairs, deck):
         if card.value == twoPairs[0].value or card.value == twoPairs[2].value:
             outs.append(card)
     return outs
-
-def check3ofaKind(player, board, deck):
-    cardsInPlay = createCardsToCheck(player,board)
-    if len(cardsInPlay) < 3:
-            return False, False
-    else:
-        threeOfAKind = []
-        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
-        for i in range(len(cardsInPlay)-2):
-            if cardsInPlay[i].value == cardsInPlay[i+1].value == cardsInPlay[i+2].value:
-                threeOfAKind.append(cardsInPlay[i])
-                threeOfAKind.append(cardsInPlay[i+1])
-                threeOfAKind.append(cardsInPlay[i+2])
-        # Managing 4 of a kind
-        threeOfAKind = list(set(threeOfAKind))
-        threeOfAKind.sort(key=lambda card: card.value, reverse=True)
-        # Managing 2 three of a kind on board
-        threeOfAKind = threeOfAKind[:3]
-        if threeOfAKind == []:
-            return False, False
-        else:
-            outs = check3ofaKindOuts(player, board, deck, threeOfAKind)
-            #print('>>> check3ofaKind : ', end = '')
-            #print(threeOfAKind)
-            #print('>>> check3ofaKindOuts : ', end = '')
-            #print(outs)
-            return threeOfAKind, outs
 
 def check3ofaKindOuts(player, board, deck, threeOfAKind):
     outs = []
@@ -511,38 +531,6 @@ def check3ofaKindOuts(player, board, deck, threeOfAKind):
                 if card.value == kard.value:
                     outs.append(kard)
     return outs
-
-def checkStraight(player, board, deck):
-    cardsInPlay = createCardsToCheck(player, board)
-    if len(cardsInPlay) < 5:
-            return False, False
-    else:
-        straight = []
-        cardsInPlay.sort(key=lambda card: card.value, reverse=True)
-        cardsInPlay2 = createCardsToCheck(player, board)
-        cardsInPlay2.sort(key=lambda card: card.value, reverse=True)
-        # Removing eventual pair
-        for i in range(len(cardsInPlay)-1):
-            if cardsInPlay[i].value == cardsInPlay[i+1].value:
-                cardsInPlay2.remove(cardsInPlay[i+1])
-                pass
-        # Looking for straight
-        for i in range(len(cardsInPlay2)-4):
-            if cardsInPlay2[i].value == cardsInPlay2[i+1].value+1 == cardsInPlay2[i+2].value+2 == cardsInPlay2[i+3].value+3 == cardsInPlay2[i+4].value+4:
-                straight.append(cardsInPlay2[i])
-                straight.append(cardsInPlay2[i+1])
-                straight.append(cardsInPlay2[i+2])
-                straight.append(cardsInPlay2[i+3])
-                straight.append(cardsInPlay2[i+4])
-                outs = checkStraightOuts(player, board, deck, straight)
-                #print('>>> checkStraight : ', end = '')
-                #print(straight)
-                #print('>>> checkStraightOuts : ', end = '')
-                print(outs)
-                return straight, outs
-            else:
-                pass
-        return False, False
 
 def checkStraightOuts(player, board, deck, straight):
     outs = []
@@ -578,43 +566,13 @@ def checkStraightOuts(player, board, deck, straight):
                     outs.append(kard)
             return outs
 
-def checkFlush(player, board, deck):
-    flush = ['n/a']
-    outs = checkFlushOuts(player, board, deck, flush)
-    print('-------------')
-    checkOutsForStraight(createCardsToCheck(player, board), deck)
-    print('-------------')
-    print('>>> checkXXX : ', end = '')
-    print(flush)
-    print('>>> checkXXXOuts : ', end = '')
-    print(outs)
-    return flush, outs
-
 def checkFlushOuts(player, board, deck, flush):
     outs = ['n/A']
     return outs
 
-# straightFlush, straightFlushOs = checkStraightFlush(player, board, deck)
-# fourOfAKind, fourOfAKindOs = check4ofaKind(player, board, deck)
-# fullHouse, fullHouseOs = checkFullHouse(player, board, deck)
-# flush, flushOs = checkFlush(player, board, deck)
 
-# def checkXXX(player, board, deck):
-#     XXX = ['n/a']
-#     outs = checkXXXOuts(player, board, deck, XXX)
-#     print('>>> checkXXX : ', end = '')
-#     print(straight)
-#     print('>>> checkXXXOuts : ', end = '')
-#     print(outs)
-#     return XXX, outs
-#
-# def checkXXXOuts(player, board, deck, XXX):
-#     outs = ['n/A']
-#     return outs
-
-#checkOutsForStraight !!!
-# warning couleur
-# warning suite
+# WARNING couleur
+# WARNING suite
 
 #
 ##

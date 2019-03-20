@@ -202,7 +202,7 @@ sideBar.pack(side=RIGHT,fill=X)
 #
 
 def refreshUI(player, board, deck):
-    checkPlayersHandRanking(player)
+    definePlayersHandRanking(player)
     # Refreshing cards in play pane
     cardElems = [player_one.hand1, player_one.hand2, board_one.flop1, board_one.flop2, board_one.flop3, board_one.turn, board_one.river]
     uiCardElems = [btnPH1, btnPH2, btnBF1, btnBF2, btnBF3, btnBT, btnBR]
@@ -213,21 +213,27 @@ def refreshUI(player, board, deck):
             uiCardElems[i]['text'] = ''
     # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
+
+
     # Refreshing combination pane
-    # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse
-    uiCombElems = [lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
-    if onClickCheckPokerCombination(player, board, deck):
-        flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
-        uiCombElemsValue = [flush, straight, threeOfAKind, twoPairs, pair, hc]
-        uiCombElemsOuts = [flushOs, straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
-        for i in range(len(uiCombElems)):
-            if uiCombElemsValue[i]:
-                uiCombElems[i]['fg']='#00ff00'
-            else:
-                uiCombElems[i]['fg']='#ff0000'
-    else:
-        for i in range(len(uiCombElems)):
-            uiCombElems[i]['fg']='#000000'
+    checkPokerCombination(player, board, deck)
+    
+    # # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse
+    # uiCombElems = [lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    # if onClickCheckPokerCombination(player, board, deck):
+    #     flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
+    #     uiCombElemsValue = [flush, straight, threeOfAKind, twoPairs, pair, hc]
+    #     uiCombElemsOuts = [flushOs, straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
+    #     for i in range(len(uiCombElems)):
+    #         if uiCombElemsValue[i]:
+    #             uiCombElems[i]['fg']='#00ff00'
+    #         else:
+    #             uiCombElems[i]['fg']='#ff0000'
+    # else:
+    #     for i in range(len(uiCombElems)):
+    #         uiCombElems[i]['fg']='#000000'
+
+
     # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
     # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
     window.geometry(window.geometry())
@@ -237,7 +243,7 @@ def playersCardClicked(btn, player, board, deck):
     # Print error if no card in button
     print('> playersCardClicked : ', end = '')
     print(btn2card(btn))
-    checkPlayersHandRanking(player)
+    definePlayersHandRanking(player)
     cardsInPlayClicked(btn, player, board, deck)
     return True
 
@@ -370,7 +376,7 @@ def resetCardsInPlay(player, board, deck):
     board.flop3 = []
     board.turn = []
     board.river = []
-    checkPlayersHandRanking(player)
+    definePlayersHandRanking(player)
     refreshUI(player, board, deck)
     print('> resetCardsInPlay')
     print(len(deck.cards))
