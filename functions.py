@@ -107,6 +107,7 @@ def definePlayersHandRanking(player):
         player.handRank = int()
     return True
 
+# Function that generate a list of cards to evaluate (removing empty slots)
 def createCardsToCheck(player,board):
     allSlots = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
     # Remove empty slot
@@ -121,7 +122,7 @@ def checkPokerCombination(player, board, deck):
     combinationsFunctionsList = [isRoyalFlush, isStraightFlush, is4ofaKind, isFullHouse, isFlush, isStraight, is3ofaKind, is2Pairs, isPair, isHighCard]
     # outsFunctionsList = [outs for royal flush, ..., outs for high card]
     for i in range(len(combinationsFunctionsList)):
-        #### /! Double function exec ###
+        #### /! Double function exec /! ###
         if combinationsFunctionsList[i](player, board, deck) is False:
             bestCombination.append(False)
             # search outs
@@ -129,11 +130,11 @@ def checkPokerCombination(player, board, deck):
             bestCombination.append(combinationsFunctionsList[i](player, board, deck))
             # search outs
             print(bestCombination)
-            return True
-    print('ERROR : No poker combination found')
+            return bestCombination
+    print('ERROR : No poker combination found (no cards given)')
     return False
 
-# Functions to return generic cards combinations
+# Functions that return generic cards combinations
 def searchForPairs(cardslist):
     # Funtion that returns all pairs from a given cardsList
     # If no pair possible return false
@@ -281,7 +282,7 @@ def searchForFlush(cardslist):
                 return flush
         return False
 
-# Functions to return outs for generic cards combinations
+# Functions that return outs in order to hit a specific cards combination
 def checkOutsForHighCard(cardslist, deck):
     # higher cards (hand/allcards...?)
     # higher straight (straightCards)
@@ -382,8 +383,8 @@ def checkOutsForFlush(cardslist, deck):
     outs.sort(key=lambda card: card.value, reverse=True)
     return outs
 
-# Functions that return poker combinations if true
-# (using the above searchForXxx functions)
+# Functions that check if a specific poker combination is found
+# (using the above searchForXxx generic functions)
 def isHighCard(player, board, deck):
     cardsInPlay = createCardsToCheck(player,board)
     if cardsInPlay == []:
@@ -442,9 +443,12 @@ def isFullHouse(player, board, deck):
         return fullHouse
     # Case of multiple 3 of a kind on board
     elif threeOfAKind:
-        fullHouse2 = []
-        fullHouse2 = threeOfAKind[:5]
-        return fullHouse2
+        if len(threeOfAKind) >= 6:
+            fullHouse2 = []
+            fullHouse2 = threeOfAKind[:5]
+            return fullHouse2
+        else:
+            return False
     else:
         return False
 
@@ -480,7 +484,10 @@ def isRoyalFlush(player, board, deck):
             return straightFlush
     return False
 
-
+# Functions that return outs for a given poker combination
+# (using the above searchOutsForXxx generic functions)
+def highCardOuts(player, board, deck):
+    print('OKLM')
 
 #########################
 #########################

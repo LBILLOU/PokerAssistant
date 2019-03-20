@@ -164,7 +164,7 @@ lblBRiver.grid(row=2,column=4,columnspan=1)
 # Side Bar UI
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:check3ofaKind(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
+btnReset = Button(sideBar,text='Check',command=lambda:highCardOuts(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=1,column=0)
 
 # Combination Panu UI
@@ -211,24 +211,36 @@ def refreshUI(player, board, deck):
             uiCardElems[i]['text'] = cardElems[i][0].show()
         else:
             uiCardElems[i]['text'] = ''
+
     # Refreshing player's hand rank
     lblPHR['text'] = str(player_one.handRank)
 
-
     # Refreshing combination pane
-    checkPokerCombination(player, board, deck)
-    
-    # # uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse
-    # uiCombElems = [lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    if len(createCardsToCheck(player,board)) >= 7:
+        bestCombination = checkPokerCombination(player, board, deck)
+        bestCombIndex = len(bestCombination)-1
+        for elem in uiCombElems:
+            elem['fg']='#0000ff' #BLUE
+        uiCombElems[bestCombIndex]['fg']='#00ff00' #GREEN
+
+    elif len(createCardsToCheck(player,board)) >= 1:
+        bestCombination = checkPokerCombination(player, board, deck)
+        for i in range(len(bestCombination)):
+            if bestCombination[i] == False:
+                uiCombElems[i]['fg']='#ff8800' #ORANGE
+            else:
+                uiCombElems[i]['fg']='#00ff00' #GREEN
+                for j in range(i+1,len(uiCombElems)):
+                    uiCombElems[j]['fg']='#707070' #GREY
+    else:
+        for elem in uiCombElems:
+            elem['fg']='#000000' #BLACK
+
+    # if len(cardsInPlay) == 7 --> only winning combination
+
     # if onClickCheckPokerCombination(player, board, deck):
-    #     flush, flushOs, straight, straightOs, threeOfAKind, threeOfAKindOs, twoPairs, twoPairsOs, pair, pairOs, hc, hcOs = checkPokerCombination(player, board, deck)
-    #     uiCombElemsValue = [flush, straight, threeOfAKind, twoPairs, pair, hc]
-    #     uiCombElemsOuts = [flushOs, straightOs, threeOfAKindOs, twoPairsOs, pairOs, hcOs]
-    #     for i in range(len(uiCombElems)):
-    #         if uiCombElemsValue[i]:
-    #             uiCombElems[i]['fg']='#00ff00'
-    #         else:
-    #             uiCombElems[i]['fg']='#ff0000'
+    #     xxx
     # else:
     #     for i in range(len(uiCombElems)):
     #         uiCombElems[i]['fg']='#000000'
@@ -344,24 +356,6 @@ def selectionPaneClicked(btn, player, board, deck):
             return True
     refreshUI(player, board, deck)
     return False
-
-def onClickCheckPokerCombination(player, board, deck):
-    # On click check if poker combinations are to be calculated
-    # Calculatio occurs when 2, 5, 6 or 7 cards are in play
-    cardsInPlay = [player.hand1, player.hand2, board.flop1, board.flop2, board.flop3, board.turn, board.river]
-    cardSlot = [elem for elem in cardsInPlay if elem != []]
-    cardsInPlayFilledValue = 0
-    # Making sure slots are filled consecutively
-    for i in range(len(cardsInPlay)):
-        if cardsInPlay[i]:
-            cardsInPlayFilledValue = i
-        else:
-            break
-    if cardsInPlayFilledValue == len(cardSlot) - 1:
-             return True
-    else:
-         print('>>> checkPokerCombination : cards slots KO')
-         return False
 
 def resetCardsInPlay(player, board, deck):
     # Reset button to reset all cards in play
