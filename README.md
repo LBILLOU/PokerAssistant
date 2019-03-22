@@ -7,3 +7,6 @@
 |        |• board's cards display|
 |        |• player's hand score|
 |        |• reset button|
+|**v0.2**|• poker combination calculator|
+|        |• poker combination visualizer|
+|        |• outs calculator|
