@@ -83,23 +83,28 @@ def chenFormula(cardA, cardB):
     # Return Score
     return chenScore
 
-# Function to convert Chen score to rank
-####### Rank --> /100 ?
+# Function to convert Chen score (-1 to 20) to rank (0 to 10)
 def chen2rank(chenScore):
     # Function to convert chen score to a rank from 0 to 7
     if chenScore >= 12:
-        return 7
+        return 10
     elif chenScore >= 10:
-        return 6
+        return 9
     elif chenScore == 9:
-        return 5
+        return 8
     elif chenScore == 8:
-        return 4
+        return 7
     elif chenScore == 7:
-        return 3
+        return 6
     elif chenScore == 6:
-        return 2
+        return 5
     elif chenScore == 5:
+        return 4
+    elif chenScore == 4:
+        return 3
+    elif chenScore == 3:
+        return 2
+    elif chenScore == 2:
         return 1
     else:
         return 0
