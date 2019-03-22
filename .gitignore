@@ -2,6 +2,7 @@
 __pycache__/*
 icon/*
 
+
 # pyinstaller files
 build/*
 dist/*
