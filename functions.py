@@ -2,6 +2,7 @@ import math
 from classes import *
 from collections import Counter
 
+# Function to transcode a cardButton clicked into a card using btn text
 def btn2card(btn):
     # Generate card from Button
     if len(btn['text']) == 2:
@@ -33,6 +34,7 @@ def btn2card(btn):
         suit = 'S'
     return Card(value, suit)
 
+# Chen formula used to set plyer's hand ranking
 def chenFormula(cardA, cardB):
     # http://www.thepokerbank.com/strategy/basic/starting-hand-selection/chen-formula/
     # Initializing score
@@ -81,6 +83,8 @@ def chenFormula(cardA, cardB):
     # Return Score
     return chenScore
 
+# Function to convert Chen score to rank
+####### Rank --> /100 ?
 def chen2rank(chenScore):
     # Function to convert chen score to a rank from 0 to 7
     if chenScore >= 12:
@@ -100,6 +104,7 @@ def chen2rank(chenScore):
     else:
         return 0
 
+# Function to define player's hand rankind
 def definePlayersHandRanking(player):
     if player.hand1 and player.hand2:
         player.handRank = chen2rank(chenFormula(player.hand1[0], player.hand2[0]))
@@ -116,21 +121,37 @@ def createCardsToCheck(player,board):
     cardsInPlay = [card for cardList in cardSlots for card in cardList]
     return cardsInPlay
 
+# Function that return a dict in order to store outs for all combinations
+def createOutsDict():
+    dict = { "RF": [], # 1 -> outs to get a Royal flush
+            "SF": [],  # 2 -> outs to get a Straight Flush (or higher)
+            "4K": [],  # 3 -> outs to get a 4 of a Kind
+            "FH": [],  # 4 -> outs to get a Full house (or higher)
+            "F": [],  # 5 -> outs to get a Flush (or higher)
+            "S": [],  # 6 -> outs to get a Straight (or higher)
+            "3K": [],  # 7 -> outs to get a 3 of a Kind (or higher)
+            "2P": [],  # 8 -> outs to get 2 pairs (or higher)
+            "P": [],  # 9 -> outs to get a Pair (or higher)
+            "HC": []  # 10 -> outs to get a Higher Card
+            }
+    return dict
+
 # Function which returns highest combination and outs
 def checkPokerCombination(player, board, deck):
     bestCombination = []
     combinationsFunctionsList = [isRoyalFlush, isStraightFlush, is4ofaKind, isFullHouse, isFlush, isStraight, is3ofaKind, is2Pairs, isPair, isHighCard]
+    outsFunctionsList = [royalFlushOuts, straightFlushOuts, fourOfAKindOuts, fullHouseOuts, flushOuts, straightOuts, threeOfAKindOuts, twoPairsOuts, pairOuts, highCardOuts]
     # outsFunctionsList = [outs for royal flush, ..., outs for high card]
     for i in range(len(combinationsFunctionsList)):
-        #### /! Double function exec /! ###
-        if combinationsFunctionsList[i](player, board, deck) is False:
+        functionResult = combinationsFunctionsList[i](player, board, deck)
+        if functionResult is False:
             bestCombination.append(False)
-            # search outs
         else:
-            bestCombination.append(combinationsFunctionsList[i](player, board, deck))
-            # search outs
+            bestCombination.append(functionResult)
+            outs = outsFunctionsList[i](player, board, deck, bestCombination[-1])
             print(bestCombination)
-            return bestCombination
+            print(outs)
+            return bestCombination, outs
     print('ERROR : No poker combination found (no cards given)')
     return False
 
@@ -284,7 +305,8 @@ def searchForFlush(cardslist):
 
 # Functions that return outs in order to hit a specific cards combination
 def checkOutsForHighCard(cardslist, deck):
-    # higher cards (hand/allcards...?)
+    # Used for High card --> higher cards
+    #
     # higher straight (straightCards)
     # higher flush straight (straightCards + flush suit)
     # higher flush (flushCards + flush suit)
@@ -298,9 +320,6 @@ def checkOutsForHighCard(cardslist, deck):
     return outs
 
 def checkOutsForPair(cardslist, deck):
-    # high -> pairs (all cards)
-    # pair -> 2 pairs (all cards except pair)
-    # 3ofakind -> fullhouse (all cards except 3oaKind)
     outs = list()
     cardslist.sort(key=lambda card: card.value, reverse=True)
     for card in deck.cards:
@@ -311,9 +330,6 @@ def checkOutsForPair(cardslist, deck):
     return outs
 
 def checkOutsFor3or4ofaKind(cardslist, deck):
-    # pair -> 3ofakind (pair)
-    # 2 pairs -> full house (2pairs)
-    # 3ofaKind -> 4ofaKind (3ofakind)
     if len(cardslist) < 2:
         return False
     outs = list()
@@ -327,7 +343,6 @@ def checkOutsFor3or4ofaKind(cardslist, deck):
     return outs
 
 def checkOutsForStraight(cardslist, deck):
-    # high, pair, 2pairs, 3ofakind -> straight ?
     outs = list()
     cardslist.sort(key=lambda card: card.value, reverse=True)
     cardslist2 = cardslist.copy()
@@ -348,6 +363,7 @@ def checkOutsForStraight(cardslist, deck):
                     outs.append(card)
             return outs
     # Case of straight with a missing card
+    aboveMissing = Card(2, 'H') # Setting default value to aboveMissing
     for i in range(len(cardslist2)-3):
         # Case 1.111
         if cardslist2[i].value  == cardslist2[i+1].value+2 == cardslist2[i+2].value+3 == cardslist2[i+3].value+4:
@@ -358,6 +374,7 @@ def checkOutsForStraight(cardslist, deck):
         # Case 111.1
         elif cardslist2[i].value == cardslist2[i+1].value+1 == cardslist2[i+2].value+2 == cardslist2[i+3].value+4:
             aboveMissing = cardslist2[i+2]
+
         for card in deck.cards:
             if card.value == aboveMissing.value - 1:
                 outs.append(card)
@@ -486,101 +503,130 @@ def isRoyalFlush(player, board, deck):
 
 # Functions that return outs for a given poker combination
 # (using the above searchOutsForXxx generic functions)
-def highCardOuts(player, board, deck):
-    print('OKLM')
-
-#########################
-#########################
-
-def checkHighCardOuts(deck, highCard):
-    outs = []
-    for i in range(len(deck.cards)):
-        if deck.cards[i].value > highCard.value:
-            outs.append(deck.cards[i])
-    return outs
-
-def checkPairOuts(player, board, deck, pair):
-    outs = []
+def highCardOuts(player, board, deck, currentHC):
+    outs = createOutsDict()
+    # Seeking higher card
+    highCard = list()
+    highCard.append(currentHC)
+    outs['HC'] = checkOutsForHighCard(highCard, deck)
+    # Seeking pair
     cardsInPlay = createCardsToCheck(player,board)
-    # Seeking three of a kind
-    for card in deck.cards:
-        if card.value == pair[0].value:
-            outs.append(card)
-        # Seeking second pair
-        for kard in cardsInPlay:
-            if card.value == kard.value:
-                outs.append(card)
-    # Removing duplicates in outs
-    outs = list(set(outs))
-    # Sorting outs
-    outs.sort(key=lambda card: card.value, reverse=True)
+    outs['P'] = checkOutsForPair(cardsInPlay, deck)
+    # Seeking straight
+    outs['S'] = checkOutsForStraight(cardsInPlay, deck)
     return outs
 
-def check2PairsOuts(twoPairs, deck):
-    outs = []
-    # Seeking "Full" combination -> cards with same value as any of the pairs
-    for card in deck.cards:
-        if card.value == twoPairs[0].value or card.value == twoPairs[2].value:
-            outs.append(card)
+def pairOuts(player, board, deck, currentP):
+    outs = createOutsDict()
+    cardsInPlay = createCardsToCheck(player,board)
+    cardsLeft = [card for card in cardsInPlay if card not in currentP]
+    higherCardsLeft = [card for card in cardsLeft if card.value > currentP[0].value]
+    # Seeking a higher pair
+    outs['P'] = checkOutsForPair(higherCardsLeft, deck)
+    # Seeking a second pair
+    outs['2P'] = checkOutsForPair(cardsLeft, deck)
+    # Seeking 3 of a kind
+    outs['3K'] = checkOutsFor3or4ofaKind(currentP, deck)
+    # Seeking straight
+    outs['S'] = checkOutsForStraight(cardsInPlay, deck)
+    # Seeking flush
+    outs['F'] = checkOutsForFlush(cardsInPlay, deck)
     return outs
 
-def check3ofaKindOuts(player, board, deck, threeOfAKind):
-    outs = []
-    # Seeking four of a kind
-    for card in deck.cards:
-        if threeOfAKind[0].value == card.value:
-            outs.append(card)
-    # Seeking Full House
-    cardsInPlay = createCardsToCheck(player, board)
-    for card in cardsInPlay:
-        if card.value != threeOfAKind[0].value:
-            for kard in deck.cards:
-                if card.value == kard.value:
-                    outs.append(kard)
+def twoPairsOuts(player, board, deck, current2P):
+    outs = createOutsDict()
+    cardsInPlay = createCardsToCheck(player,board)
+    cardsLeft = [card for card in cardsInPlay if card not in current2P]
+    higherCardsLeft = [card for card in cardsLeft if card.value > current2P[-1].value]
+    # Seeking higher second pair
+    outs['2P'] = checkOutsForPair(higherCardsLeft, deck)
+    # Seeking straight
+    outs['S'] = checkOutsForStraight(cardsInPlay, deck)
+    # Seeking flush
+    outs['F'] = checkOutsForFlush(cardsInPlay, deck)
+    # Seeking full house
+    outs['FH'] = checkOutsFor3or4ofaKind(current2P, deck)
     return outs
 
-def checkStraightOuts(player, board, deck, straight):
-    outs = []
-    hearts = 0
-    clubs = 0
-    diamonds = 0
-    spades = 0
-    straightFlushSuit = str()
+def threeOfAKindOuts(player, board, deck, current3K):
+    outs = createOutsDict()
+    cardsInPlay = createCardsToCheck(player,board)
+    cardsLeft = [card for card in cardsInPlay if card not in current3K]
+    # Seeking straight
+    outs['S'] = checkOutsForStraight(cardsInPlay, deck)
+    # Seeking flush
+    outs['F'] = checkOutsForFlush(cardsInPlay, deck)
+    # Seeking full house
+    outs['FH'] = checkOutsForPair(cardsLeft, deck)
+    # Seeking 4 of a kind
+    outs['4K'] = checkOutsFor3or4ofaKind(current3K, deck)
+    return outs
+
+def straightOuts(player, board, deck, currentS):
+    outs = createOutsDict()
+    cardsInPlay = createCardsToCheck(player,board)
+    # Seeking higher straight
+    outs['S'] = checkOutsForHighCard(currentS, deck)[-4:]
+    # Seeking flush
+    outs['F'] = checkOutsForFlush(cardsInPlay, deck)
     # Seeking straight flush
-    for card in straight: # Seeking most represented suit
-        if card.suit == 'H':
-            hearts += 1
-        elif card.suit == 'C':
-            clubs += 1
-        elif card.suit == 'D':
-            diamonds += 1
-        elif card.suit == 'S':
-            spades += 1
-    if hearts == 4: # Setting most representee suit in var
-        straightFlushSuit = 'H'
-    elif clubs == 4:
-        straightFlushSuit = 'C'
-    elif diamonds == 4:
-        straightFlushSuit = 'D'
-    elif spades == 4:
-        straightFlushSuit = 'S'
-    else:
-        return outs
-    for card in straight: # Seeking outs as same value card as different suit card in current straight
-        if card.suit != straightFlushSuit:
-            for kard in deck.cards:
-                if kard.value == card.value:
-                    outs.append(kard)
-            return outs
-
-def checkFlushOuts(player, board, deck, flush):
-    outs = ['n/A']
+    outs['SF'] = checkOutsForFlush(currentS, deck)
+    outs['SF'] = [card for card in outs['SF'] if card.value <= currentS[0].value]
+    outs['SF'] = [card for card in outs['SF'] if card.value >= currentS[-1].value]
+    # Seeking royal flush
+    if currentS[0].value == 13 and outs['F']:
+        outs['RF'] = [card for card in deck.cards if card.value > currentS[0].value and card.suit == currentS[0].suit]
     return outs
 
+def flushOuts(player, board, deck, currentF):
+    outs = createOutsDict()
+    # Seeking higher  flush
+    outs['F'] = checkOutsForHighCard(currentF, deck)[-4:]
+    # Seeking straight flush
+    outs['SF'] = checkOutsForStraight(currentF, deck)
+    outs['SF'] = [card for card in outs['SF'] if card.suit == currentF[0].suit]
+    # Seeking royal flush
+    if currentF[0].value == 13 and outs['SF']:
+        outs['RF'] = [card for card in deck.cards if card.value > currentF[0].value and card.suit == currentF[0].suit]
+    return outs
+
+def fullHouseOuts(player, board, deck, currentFH):
+    outs = createOutsDict()
+    cardsInPlay = createCardsToCheck(player,board)
+    cardsWithout3oaK = [card for card in cardsInPlay if card not in currentFH[:3]]
+    # Seeking higher full house
+    outs['FH'] = checkOutsFor3or4ofaKind(cardsWithout3oaK, deck)
+    # Seeking 4 of a kind
+    outs['4K'] = checkOutsFor3or4ofaKind(currentFH[:3], deck)
+    return outs
+
+def fourOfAKindOuts(player, board, deck, current4K):
+    outs = createOutsDict()
+    # No outs when having 4 of a kind
+    return outs
+
+def straightFlushOuts(player, board, deck, currentSF):
+    outs = createOutsDict()
+    # Seeking higher straight flush
+    outs['SF'] = checkOutsForHighCard(currentSF, deck)[-4:]
+    # Seeking royal flush
+    if currentSF[0].value == 13:
+        outs['RF'] = [card for card in deck.cards if card.value > currentSF[0].value and card.suit == currentSF[0].suit]
+    return outs
+
+def royalFlushOuts(player, board, deck, currentRF):
+    outs = createOutsDict()
+    # No outs for the best combination in the game
+    return outs
+
+#########################
+#########################
 
 # WARNING couleur
 # WARNING suite
 
+#outs = list(set(outs))
+#outs.sort(key=lambda card: card.value, reverse=True)
 #
 ##
 ###

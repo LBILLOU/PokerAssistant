@@ -160,12 +160,9 @@ lblBTurn.grid(row=2,column=3,columnspan=1)
 lblBRiver = Label(cardsInPlayPane,text='River')
 lblBRiver.grid(row=2,column=4,columnspan=1)
 
-
 # Side Bar UI
 btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
 btnReset.grid(row=0,column=0)
-btnReset = Button(sideBar,text='Check',command=lambda:highCardOuts(player_one,board_one,deck_one),width=5,highlightbackground='#000000')
-btnReset.grid(row=1,column=0)
 
 # Combination Panu UI
 lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=14,anchor=W)
@@ -198,8 +195,6 @@ cardsInPlayPane.pack(side=LEFT,fill=X)
 combinationPane.pack(side=LEFT,fill=X)
 sideBar.pack(side=RIGHT,fill=X)
 
-# .pop() into funcion
-#
 
 def refreshUI(player, board, deck):
     definePlayersHandRanking(player)
@@ -218,14 +213,14 @@ def refreshUI(player, board, deck):
     # Refreshing combination pane
     uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
     if len(createCardsToCheck(player,board)) >= 7:
-        bestCombination = checkPokerCombination(player, board, deck)
+        bestCombination, outs = checkPokerCombination(player, board, deck)
         bestCombIndex = len(bestCombination)-1
         for elem in uiCombElems:
             elem['fg']='#0000ff' #BLUE
         uiCombElems[bestCombIndex]['fg']='#00ff00' #GREEN
 
     elif len(createCardsToCheck(player,board)) >= 1:
-        bestCombination = checkPokerCombination(player, board, deck)
+        bestCombination, outs = checkPokerCombination(player, board, deck)
         for i in range(len(bestCombination)):
             if bestCombination[i] == False:
                 uiCombElems[i]['fg']='#ff8800' #ORANGE
@@ -237,19 +232,12 @@ def refreshUI(player, board, deck):
         for elem in uiCombElems:
             elem['fg']='#000000' #BLACK
 
-    # if len(cardsInPlay) == 7 --> only winning combination
-
-    # if onClickCheckPokerCombination(player, board, deck):
-    #     xxx
-    # else:
-    #     for i in range(len(uiCombElems)):
-    #         uiCombElems[i]['fg']='#000000'
-
 
     # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
     # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
     window.geometry(window.geometry())
     return True
+
 
 def playersCardClicked(btn, player, board, deck):
     # Print error if no card in button
@@ -372,13 +360,10 @@ def resetCardsInPlay(player, board, deck):
     board.river = []
     definePlayersHandRanking(player)
     refreshUI(player, board, deck)
-    print('> resetCardsInPlay')
+    print('> resetCardsInPlay : ', end = '')
     print(len(deck.cards))
     return True
 
 
+
 window.mainloop()
-
-
-#print('Cards in deck : ' + str(len(deck.cards)))
-#print(button2card(btn14H.cget('text')))
