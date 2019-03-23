@@ -10,11 +10,10 @@
 |**v0.2**|• poker combination calculator|
 |        |• poker combination visualizer|
 |        |• outs calculator|
-
+|**v0.3**|• outs visualizer|
 
 |To Do |To Do|
 |--------|--------|
-|        |• outs visualizer|
 |        |• new "right" panel recap|
 |        |• -> hand rank|
 |        |• -> current combination|

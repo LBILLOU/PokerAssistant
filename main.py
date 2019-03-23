@@ -9,6 +9,8 @@ board_one = Board()
 
 window = Tk()
 window.title('Poker Assistant')
+window.configure(bg='#000000')
+window.resizable(height=False,width=False)
 
 # Colors
 redCard = '#ff0000'
@@ -22,8 +24,8 @@ BLACK = '#000000'
 selectionPane = Frame(window)
 playerPane = Frame(window)
 cardsInPlayPane = Frame(window)
-sideBar = Frame(window)
 combinationPane = Frame(window)
+informationPane = Frame(window)
 
 # SELECTION PANE UI
 # Hearts ♥♥♥♥♥♥♥
@@ -134,17 +136,17 @@ btn5S.grid(row=10,column=3)
 btn4S.grid(row=11,column=3)
 btn3S.grid(row=12,column=3)
 btn2S.grid(row=13,column=3)
+
 # Player Pane UI
 btnPH1 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH1,player_one,board_one,deck_one),width=3,highlightbackground=hand)
 btnPH2 = Button(playerPane,text='-',command=lambda:playersCardClicked(btnPH2,player_one,board_one,deck_one),width=3,highlightbackground=hand)
 btnPH1.grid(row=1,column=0)
 btnPH2.grid(row=1,column=1)
 
-
 lblPName = Label(playerPane,text=player_one.name.upper())
-lblPHR = Label(playerPane,text='0')
+lblPH = Label(playerPane,text='Hand')
 lblPName.grid(row=0,columnspan=2)
-lblPHR.grid(row=2,columnspan=2)
+lblPH.grid(row=2,columnspan=2)
 
 # Cards in Play Pane UI
 btnBF1 = Button(cardsInPlayPane,text='-',command=lambda:boardCardClicked(btnBF1,player_one,board_one,deck_one),width=3,highlightbackground=flop)
@@ -157,6 +159,8 @@ btnBF2.grid(row=1,column=1)
 btnBF3.grid(row=1,column=2)
 btnBT.grid(row=1,column=3)
 btnBR.grid(row=1,column=4)
+btnReset = Button(cardsInPlayPane,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground=BLACK)
+btnReset.grid(row=1,column=5)
 
 lblBoardName = Label(cardsInPlayPane,text='BOARD')
 lblBoardName.grid(row=0,columnspan=5)
@@ -167,22 +171,18 @@ lblBTurn.grid(row=2,column=3,columnspan=1)
 lblBRiver = Label(cardsInPlayPane,text='River')
 lblBRiver.grid(row=2,column=4,columnspan=1)
 
-# Side Bar UI
-btnReset = Button(sideBar,text='Reset',command=lambda:resetCardsInPlay(player_one,board_one,deck_one),width=5,highlightbackground=BLACK)
-btnReset.grid(row=0,column=0)
-
 # Combination Panu UI
-lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=14,anchor=W)
-lblStrFlush = Label(combinationPane,text='Straight Flush',width=14,anchor=W)
-lbl4oaKind = Label(combinationPane,text='Four of a Kind',width=14,anchor=W)
-lblFullHouse = Label(combinationPane,text='Full House',width=14,anchor=W)
-lblFlush = Label(combinationPane,text='Flush',width=14,anchor=W)
-lblStraight = Label(combinationPane,text='Straight',width=14,anchor=W)
-lbl3oaKind = Label(combinationPane,text='Three of a Kind',width=14,anchor=W)
-lbl2Pairs = Label(combinationPane,text='Two Pairs',width=14,anchor=W)
-lblPair = Label(combinationPane,text='Pair',width=14,anchor=W)
-lblHighCard = Label(combinationPane,text='High Card',width=14,anchor=W)
-lblSpacing = Label(combinationPane,text='',anchor=W)
+lblRoyalFlush = Label(combinationPane,text='Royal Flush',width=12,anchor=W)
+lblStrFlush = Label(combinationPane,text='Straight Flush',width=12,anchor=W)
+lbl4oaKind = Label(combinationPane,text='Four of a Kind',width=12,anchor=W)
+lblFullHouse = Label(combinationPane,text='Full House',width=12,anchor=W)
+lblFlush = Label(combinationPane,text='Flush',width=12,anchor=W)
+lblStraight = Label(combinationPane,text='Straight',width=12,anchor=W)
+lbl3oaKind = Label(combinationPane,text='Three of a Kind',width=12,anchor=W)
+lbl2Pairs = Label(combinationPane,text='Two Pairs',width=12,anchor=W)
+lblPair = Label(combinationPane,text='Pair',width=12,anchor=W)
+lblHighCard = Label(combinationPane,text='High Card',width=12,anchor=W)
+lblSpacingBtm = Label(combinationPane)
 lblRoyalFlush.grid(row=0,column=0)
 lblStrFlush.grid(row=1,column=0)
 lbl4oaKind.grid(row=2,column=0)
@@ -193,14 +193,78 @@ lbl3oaKind.grid(row=6,column=0)
 lbl2Pairs.grid(row=7,column=0)
 lblPair.grid(row=8,column=0)
 lblHighCard.grid(row=9,column=0)
-lblSpacing.grid(row=10,column=0)
+lblSpacingBtm.grid(row=10,column=0)
+
+outsRoyalFlush = Label(combinationPane,text='',width=12,anchor=W)
+outsStrFlush = Label(combinationPane,text='',width=12,anchor=W)
+outs4oaKind = Label(combinationPane,text='',width=12,anchor=W)
+outsFullHouse = Label(combinationPane,text='',width=12,anchor=W)
+outsFlush = Label(combinationPane,text='',width=12,anchor=W)
+outsStraight = Label(combinationPane,text='',width=12,anchor=W)
+outs3oaKind = Label(combinationPane,text='',width=12,anchor=W)
+outs2Pairs = Label(combinationPane,text='',width=12,anchor=W)
+outsPair = Label(combinationPane,text='',width=12,anchor=W)
+outsHighCard = Label(combinationPane,text='',width=12,anchor=W)
+outsSpacing = Label(combinationPane,text='',anchor=W)
+outsRoyalFlush.grid(row=0,column=1)
+outsStrFlush.grid(row=1,column=1)
+outs4oaKind.grid(row=2,column=1)
+outsFullHouse.grid(row=3,column=1)
+outsFlush.grid(row=4,column=1)
+outsStraight.grid(row=5,column=1)
+outs3oaKind.grid(row=6,column=1)
+outs2Pairs.grid(row=7,column=1)
+outsPair.grid(row=8,column=1)
+outsHighCard.grid(row=9,column=1)
+outsSpacing.grid(row=10,column=1)
+
+lblHRlbl = Label(informationPane,text='Hand Rank',width=16,anchor=CENTER)
+lblHRlbl.grid(row=0,column=0)
+lblHR = Label(informationPane,text='-',width=16,anchor=CENTER)
+lblHR.grid(row=1,column=0)
+#.grid(row=2,column=0)
+lblCClbl = Label(informationPane,text='Current Combination',width=16,anchor=CENTER)
+lblCClbl.grid(row=3,column=0)
+lblCC = Label(informationPane,text='-',width=16,anchor=CENTER)
+lblCC.grid(row=4,column=0)
+#.grid(row=5,column=0)
+lblNUOlbl = Label(informationPane,text='Number of Unique Outs',width=16,anchor=CENTER)
+lblNUOlbl.grid(row=6,column=0)
+lblNUO = Label(informationPane,text='-',width=16,anchor=CENTER)
+lblNUO.grid(row=7,column=0)
+lblUO = Label(informationPane,text='-',width=16,anchor=CENTER)
+lblUO.grid(row=8,column=0)
 
 
 selectionPane.pack(side=LEFT,fill=X)
+combinationPane.pack(side=TOP,fill=X)
+informationPane.pack(side=TOP,fill=Y)
 playerPane.pack(side=LEFT,fill=X)
 cardsInPlayPane.pack(side=LEFT,fill=X)
-combinationPane.pack(side=LEFT,fill=X)
-sideBar.pack(side=RIGHT,fill=X)
+
+def refreshInfoPane(player, board, deck, bestCombination, outs):
+    # Refreshing player's hand rank
+    lblHR['text'] = str(player_one.handRank) + '/10'
+    #######Change color#########
+    # Refreshing Current Combination and Outs
+    if len(createCardsToCheck(player,board)) >= 7:
+        lblCClbl['text'] = 'Final Combination'
+        # Refreshing outs
+        lblNUO['text'] = ''
+        lblUO['text'] = ''
+    else:
+        lblCClbl['text'] = 'Current Combination'
+        # Refreshing outs
+        flatOuts = [card for sublist in outs for card in sublist]
+        flatOuts = list(set(flatOuts))
+        flatOuts.sort(key=lambda card: card.value, reverse=True)
+        lblNUO['text'] = str(len(flatOuts))
+        lblUO['text'] = flatOuts
+
+    if bestCombination:
+        lblCC['text'] = bestCombination[-1]
+    else:
+        lblCC['text'] = ''
 
 
 def refreshUI(player, board, deck):
@@ -214,37 +278,50 @@ def refreshUI(player, board, deck):
         else:
             uiCardElems[i]['text'] = ''
 
-    # Refreshing player's hand rank
-    lblPHR['text'] = str(player_one.handRank)
-
     # Refreshing combination pane
     uiCombElems = [lblRoyalFlush, lblStrFlush, lbl4oaKind, lblFullHouse, lblFlush, lblStraight, lbl3oaKind, lbl2Pairs, lblPair, lblHighCard]
+    uiOutsElems = [outsRoyalFlush, outsStrFlush, outs4oaKind, outsFullHouse, outsFlush, outsStraight, outs3oaKind, outs2Pairs, outsPair, outsHighCard]
     if len(createCardsToCheck(player,board)) >= 7:
         bestCombination, outs = checkPokerCombination(player, board, deck)
         bestCombIndex = len(bestCombination)-1
-        for elem in uiCombElems:
-            elem['fg']='#0000ff' #BLUE
+        for i in range(len(uiCombElems)):
+            uiCombElems[i]['fg']='#0000ff' #BLUE
+            uiOutsElems[i]['fg']='#0000ff'
+            uiOutsElems[i]['text'] = ''
         uiCombElems[bestCombIndex]['fg']='#00ff00' #GREEN
+        uiOutsElems[bestCombIndex]['fg']='#00ff00'
+        uiOutsElems[bestCombIndex]['text'] = 'XXX'
 
     elif len(createCardsToCheck(player,board)) >= 1:
         bestCombination, outs = checkPokerCombination(player, board, deck)
         for i in range(len(bestCombination)):
             if bestCombination[i] == False:
                 uiCombElems[i]['fg']='#ff8800' #ORANGE
+                uiOutsElems[i]['fg']='#ff8800'
+                uiOutsElems[i]['text'] = str(len(outs[i])) + ' outs / ' + str(round(len(outs[i])/len(deck.cards)*100, 2)) + '%'
             else:
                 uiCombElems[i]['fg']='#00ff00' #GREEN
+                uiOutsElems[i]['fg']='#00ff00'
+                uiOutsElems[i]['text'] = str(len(outs[i])) + ' outs / ' + str(round(len(outs[i])/len(deck.cards)*100, 2)) + '%'
                 for j in range(i+1,len(uiCombElems)):
                     uiCombElems[j]['fg']='#707070' #GREY
+                    uiOutsElems[j]['fg']='#707070'
+                    uiOutsElems[j]['text'] = ''
     else:
-        for elem in uiCombElems:
-            elem['fg']='#000000' #BLACK
+        bestCombination = []
+        outs = []
+        for i in range(len(uiCombElems)):
+            uiCombElems[i]['fg']='#000000' #BLACK
+            uiOutsElems[i]['fg']='#000000'
+            uiOutsElems[i]['text'] = ''
 
+    # Refresh Info
+    refreshInfoPane(player, board, deck, bestCombination, outs)
 
     # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
     # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
     window.geometry(window.geometry())
     return True
-
 
 def playersCardClicked(btn, player, board, deck):
     # Print error if no card in button
@@ -367,7 +444,7 @@ def resetCardsInPlay(player, board, deck):
     board.river = []
     definePlayersHandRanking(player)
     refreshUI(player, board, deck)
-    print('> resetCardsInPlay : ', end = '')
+    print('> resetCardsInPlay, deck reset to ', end = '')
     print(len(deck.cards))
     return True
 
