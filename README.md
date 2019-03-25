@@ -12,14 +12,10 @@
 |        |• outs calculator|
 |**v0.3**|• outs visualizer|
 |        |• information panel|
-
-|To Do |To Do|
-|--------|--------|
-|        |• outs% to fix|
-|        |• UI color enhancement|
+|**v0.4**|• UI color enhancement|
 |        |• Define window opening area|
 
-|Possible|Enhancements|
+|        |Possible Enhancements|
 |--------|--------|
 |        |• Add pot odds|
 |        |• Add "advice for next move"|
