@@ -154,8 +154,8 @@ def checkPokerCombination(player, board, deck):
         else:
             bestCombination.append(functionResult)
             outs = outsFunctionsList[i](player, board, deck, bestCombination[-1])
-            print(bestCombination)
-            print(outs)
+            #print(bestCombination)
+            #print(outs)
             return bestCombination, outs
     print('ERROR : No poker combination found (no cards given)')
     return False

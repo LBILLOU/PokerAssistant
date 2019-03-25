@@ -11,15 +11,15 @@
 |        |• poker combination visualizer|
 |        |• outs calculator|
 |**v0.3**|• outs visualizer|
+|        |• information panel|
 
 |To Do |To Do|
 |--------|--------|
-|        |• new "right" panel recap|
-|        |• -> hand rank|
-|        |• -> current combination|
-|        |• -> current combination visualization|
-|        |• -> total outs + %|
-|        |• -> outs visualization|
-|        |• UI general enhancement|
-|        |• add pod odds ?|
-|        |• add advice for next move ?|
+|        |• outs% to fix|
+|        |• UI color enhancement|
+|        |• Define window opening area|
+
+|Possible|Enhancements|
+|--------|--------|
+|        |• Add pot odds|
+|        |• Add "advice for next move"|
