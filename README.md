@@ -17,7 +17,7 @@ Add chance percentage of hitting outs.
 Add pot odds to upgrade the tools completeness.       
 Add "advice for next move" to help the player.    
 
-## Features
+## Features / Versions History
 |Version |Features|
 |--------|--------|
 |**v0.1**|• 52 cards selection pane|
