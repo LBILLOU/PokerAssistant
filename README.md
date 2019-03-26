@@ -1,8 +1,8 @@
 # Poker Assistant  :hearts: :clubs: :diamonds: :spades:
 
 ## Project Details
-Quick UI to help beginner Texas Hold'em Poker players. Created using Python3,
-Tkinter and PyInstaller.
+Quick UI to help beginner Texas Hold'em Poker players.      
+Created using Python3, Tkinter and PyInstaller.
 
 ## Execution
 Simply download and run the executable file in the exeFile folder.
