@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3
 from classes import *
 from functions import *
 from tkinter import *
@@ -9,7 +8,7 @@ board_one = Board()
 
 window = Tk()
 window.title('Poker Assistant')
-window.resizable(height=False,width=False)
+#window.resizable(height=False,width=False)
 windowWidth = 726
 windowHeight = 364
 screenWidth = window.winfo_screenwidth()
@@ -361,8 +360,17 @@ def refreshUI(player, board, deck):
     refreshInfoPane(player, board, deck, bestCombination, outs)
     # Resetting size dur to MacOS Mojave x pyinstaller button refresh issue
     # https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
-    window.geometry(window.geometry()) #726x364+5+28
+    window.geometry(setGeometry()) #726x364+5+28
     return True
+
+def setGeometry():
+    geoVal = window.geometry()
+    if geoVal[0:3] == '726':
+        retVal = '727x364' + geoVal[7:]
+        return retVal
+    else:
+        retVal = '726x364' + geoVal[7:]
+        return retVal
 
 def playersCardClicked(btn, player, board, deck):
     # Print error if no card in button
@@ -488,7 +496,6 @@ def resetCardsInPlay(player, board, deck):
     print('> resetCardsInPlay, deck reset to ', end = '')
     print(len(deck.cards))
     return True
-
 
 
 window.mainloop()
