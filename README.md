@@ -12,12 +12,12 @@ Simply download and run the executable file in the exeFile folder.
 UI might not be different depending on your personal OS version.    
 Issues might occur with macOS Mojave : https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
 
-### Enhancements
+## Enhancements
 Add chance percentage of hitting outs.    
 Add pot odds to upgrade the tools completeness.       
 Add "advice for next move" to help the player.    
 
-### Features
+## Features
 |Version |Features|
 |--------|--------|
 |**v0.1**|• 52 cards selection pane|
