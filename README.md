@@ -12,6 +12,10 @@ Simply download and run the executable file in the exeFile folder.
 UI might not be different depending on your personal OS version.    
 Issues might occur with macOS Mojave : https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
 
+### Hand Ranking
+Hand ranking is done using the Chen Formula and the below transcodification to a grade over 10.
+![](https://image.noelshack.com/fichiers/2019/13/2/1553624106-capture-d-ecran-2019-03-26-a-19-14-38.png)
+
 ## Enhancements
 Add chance percentage of hitting outs.    
 Add pot odds to upgrade the tools completeness.       
