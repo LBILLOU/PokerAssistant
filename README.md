@@ -9,13 +9,13 @@ Simply download and run the executable file in the exeFile folder.
 
 ## UI Screenshot
 ![](https://image.noelshack.com/fichiers/2019/13/2/1553559164-capture-d-ecran-2019-03-26-a-01-12-01.png)
-UI might not be different depending on your personal OS version.
+UI might not be different depending on your personal OS version.    
 Issues might occur with macOS Mojave : https://stackoverflow.com/questions/52529403/button-text-of-tkinter-not-works-in-mojave
 
 ### Enhancements
-Add chance percentage of hitting outs.
-Add pot odds to upgrade the tools completeness.   
-Add "advice for next move" to help the player.
+Add chance percentage of hitting outs.    
+Add pot odds to upgrade the tools completeness.       
+Add "advice for next move" to help the player.    
 
 ### Features
 |Version |Features|
