@@ -497,5 +497,4 @@ def resetCardsInPlay(player, board, deck):
     print(len(deck.cards))
     return True
 
-
 window.mainloop()
